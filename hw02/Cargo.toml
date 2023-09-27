@@ -10,3 +10,4 @@ authors = ["Petr Laštovička"]
 bit-vec = "0.6.3"
 clap = { version = "4.4.5", features = ["derive"] }
 exitcode = "1.1.2"
+rand = "0.8.5"

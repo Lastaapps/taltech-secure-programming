@@ -1,4 +1,5 @@
 use bit_vec::BitVec;
+use rand::Rng;
 
 pub fn sqruare_and_multiply_mod(base: u64, power: u64, modulo: u64) -> u64 {
     if modulo < 2 {
@@ -87,4 +88,24 @@ fn test_sieve_of_eratosthenes() {
     assert_eq!(sieve_of_eratosthenes(256), primes);
     assert_eq!(sieve_of_eratosthenes(257), primes);
     assert_ne!(sieve_of_eratosthenes(258), primes);
+}
+
+fn random_prime() -> u64 {
+    let mut rng = rand::thread_rng();
+    let primes = sieve_of_eratosthenes(/*2f64.powi(64).sqrt() as u64*/ 2u64.pow(32));
+
+    'main: loop {
+        let number: u64 = rng.gen();
+        let number = number | 1;
+        if number < (1 << 32) {
+            continue;
+        }
+
+        for prime in primes.iter() {
+            if number % prime == 0 {
+                continue 'main;
+            }
+        }
+        break number;
+    }
 }
