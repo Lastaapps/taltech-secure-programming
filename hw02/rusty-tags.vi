@@ -1,0 +1,61 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+Args	/mnt/d/Dokumenty/Dokumenty/CVUT/2023-2024-Z/secure_programming/homeworks/hw02/src/main.rs	/^struct Args {$/;"	s
+CANTCREAT	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/exitcode-1.1.2/src/lib.rs	/^pub const CANTCREAT: ExitCode = 73;$/;"	C
+CONFIG	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/exitcode-1.1.2/src/lib.rs	/^pub const CONFIG: ExitCode = 78;$/;"	C
+DATAERR	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/exitcode-1.1.2/src/lib.rs	/^pub const DATAERR: ExitCode = 65;$/;"	C
+ExitCode	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/exitcode-1.1.2/src/lib.rs	/^pub type ExitCode = i32;$/;"	t
+IOERR	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/exitcode-1.1.2/src/lib.rs	/^pub const IOERR: ExitCode = 74;$/;"	C
+NOHOST	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/exitcode-1.1.2/src/lib.rs	/^pub const NOHOST: ExitCode = 68;$/;"	C
+NOINPUT	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/exitcode-1.1.2/src/lib.rs	/^pub const NOINPUT: ExitCode = 66;$/;"	C
+NOPERM	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/exitcode-1.1.2/src/lib.rs	/^pub const NOPERM: ExitCode = 77;$/;"	C
+NOUSER	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/exitcode-1.1.2/src/lib.rs	/^pub const NOUSER: ExitCode = 67;$/;"	C
+OK	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/exitcode-1.1.2/src/lib.rs	/^pub const OK: ExitCode = 0;$/;"	C
+OSERR	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/exitcode-1.1.2/src/lib.rs	/^pub const OSERR: ExitCode = 71;$/;"	C
+OSFILE	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/exitcode-1.1.2/src/lib.rs	/^pub const OSFILE: ExitCode = 72;$/;"	C
+PROTOCOL	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/exitcode-1.1.2/src/lib.rs	/^pub const PROTOCOL: ExitCode = 76;$/;"	C
+SOFTWARE	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/exitcode-1.1.2/src/lib.rs	/^pub const SOFTWARE: ExitCode = 70;$/;"	C
+TEMPFAIL	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/exitcode-1.1.2/src/lib.rs	/^pub const TEMPFAIL: ExitCode = 75;$/;"	C
+UNAVAILABLE	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/exitcode-1.1.2/src/lib.rs	/^pub const UNAVAILABLE: ExitCode = 69;$/;"	C
+USAGE	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/exitcode-1.1.2/src/lib.rs	/^pub const USAGE: ExitCode = 64;$/;"	C
+_cookbook	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/lib.rs	/^pub mod _cookbook;$/;"	n
+_derive	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/lib.rs	/^pub mod _derive;$/;"	n
+_faq	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/lib.rs	/^pub mod _faq;$/;"	n
+_features	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/lib.rs	/^pub mod _features;$/;"	n
+_tutorial	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_derive/mod.rs	/^pub mod _tutorial;$/;"	n
+_tutorial	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/lib.rs	/^pub mod _tutorial;$/;"	n
+cargo_example	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_cookbook/mod.rs	/^pub mod cargo_example;$/;"	n
+cargo_example_derive	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_cookbook/mod.rs	/^pub mod cargo_example_derive;$/;"	n
+chapter_0	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_derive/_tutorial/mod.rs	/^pub mod chapter_0;$/;"	n
+chapter_0	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_tutorial/mod.rs	/^pub mod chapter_0;$/;"	n
+chapter_1	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_derive/_tutorial/mod.rs	/^pub mod chapter_1;$/;"	n
+chapter_1	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_tutorial/mod.rs	/^pub mod chapter_1;$/;"	n
+chapter_2	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_derive/_tutorial/mod.rs	/^pub mod chapter_2;$/;"	n
+chapter_2	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_tutorial/mod.rs	/^pub mod chapter_2;$/;"	n
+chapter_3	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_derive/_tutorial/mod.rs	/^pub mod chapter_3;$/;"	n
+chapter_3	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_tutorial/mod.rs	/^pub mod chapter_3;$/;"	n
+chapter_4	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_derive/_tutorial/mod.rs	/^pub mod chapter_4;$/;"	n
+chapter_4	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_tutorial/mod.rs	/^pub mod chapter_4;$/;"	n
+chapter_5	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_derive/_tutorial/mod.rs	/^pub mod chapter_5;$/;"	n
+chapter_5	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_tutorial/mod.rs	/^pub mod chapter_5;$/;"	n
+client	/mnt/d/Dokumenty/Dokumenty/CVUT/2023-2024-Z/secure_programming/homeworks/hw02/src/main.rs	/^    client: bool,$/;"	m	struct:Args
+client	/mnt/d/Dokumenty/Dokumenty/CVUT/2023-2024-Z/secure_programming/homeworks/hw02/src/main.rs	/^mod client;$/;"	n
+common	/mnt/d/Dokumenty/Dokumenty/CVUT/2023-2024-Z/secure_programming/homeworks/hw02/src/main.rs	/^mod common;$/;"	n
+escaped_positional	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_cookbook/mod.rs	/^pub mod escaped_positional;$/;"	n
+escaped_positional_derive	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_cookbook/mod.rs	/^pub mod escaped_positional_derive;$/;"	n
+find	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_cookbook/mod.rs	/^pub mod find;$/;"	n
+git	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_cookbook/mod.rs	/^pub mod git;$/;"	n
+git_derive	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_cookbook/mod.rs	/^pub mod git_derive;$/;"	n
+is_error	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/exitcode-1.1.2/src/lib.rs	/^pub fn is_error(code: ExitCode) -> bool {$/;"	f
+is_success	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/exitcode-1.1.2/src/lib.rs	/^pub fn is_success(code: ExitCode) -> bool {$/;"	f
+main	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/bin/stdio-fixture.rs	/^fn main() {$/;"	f
+main	/mnt/d/Dokumenty/Dokumenty/CVUT/2023-2024-Z/secure_programming/homeworks/hw02/src/main.rs	/^fn main() -> Result<(), String> {$/;"	f
+multicall_busybox	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_cookbook/mod.rs	/^pub mod multicall_busybox;$/;"	n
+multicall_hostname	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_cookbook/mod.rs	/^pub mod multicall_hostname;$/;"	n
+pacman	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_cookbook/mod.rs	/^pub mod pacman;$/;"	n
+repl	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_cookbook/mod.rs	/^pub mod repl;$/;"	n
+run_client	/mnt/d/Dokumenty/Dokumenty/CVUT/2023-2024-Z/secure_programming/homeworks/hw02/src/client.rs	/^pub fn run_client() -> Result<(), String> {$/;"	f
+run_server	/mnt/d/Dokumenty/Dokumenty/CVUT/2023-2024-Z/secure_programming/homeworks/hw02/src/server.rs	/^pub fn run_server() -> Result<(), String>{$/;"	f
+server	/mnt/d/Dokumenty/Dokumenty/CVUT/2023-2024-Z/secure_programming/homeworks/hw02/src/main.rs	/^    server: bool,$/;"	m	struct:Args
+server	/mnt/d/Dokumenty/Dokumenty/CVUT/2023-2024-Z/secure_programming/homeworks/hw02/src/main.rs	/^mod server;$/;"	n
+typed_derive	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_cookbook/mod.rs	/^pub mod typed_derive;$/;"	n
