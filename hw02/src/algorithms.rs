@@ -114,3 +114,97 @@ pub fn random_prime() -> u64 {
         break number;
     }
 }
+
+pub fn gcd(x: u64, y: u64) -> (u64, (i64, i64)) {
+    let mut r: (u64, u64) = (x, y);
+    let mut s: (i64, i64) = (1, 0);
+    let mut t: (i64, i64) = (0, 1);
+
+    while r.1 != 0 {
+        let q = r.0 / r.1;
+        r = (r.1, r.0 - q * r.1);
+        s = (s.1, s.0 - q as i64 * s.1);
+        t = (t.1, t.0 - q as i64 * t.1);
+    }
+
+    (r.0, (s.0, t.0))
+}
+
+#[test]
+fn test_gcd() {
+
+    assert_eq!(gcd(2, 5), (1, (-2, 1)));
+    assert_eq!(gcd(5, 2), (1, (1, -2)));
+
+    assert_eq!(gcd(2, 4), (2, (1, 0)));
+    assert_eq!(gcd(4, 2), (2, (0, 1)));
+
+    assert_eq!(gcd(6, 8), (2, (-1, 1)));
+    assert_eq!(gcd(8, 6), (2, (1, -1)));
+
+    assert_eq!(gcd(1, 5), (1, (1, 0)));
+    assert_eq!(gcd(5, 1), (1, (0, 1)));
+
+    // assert_eq!(gcd(0, 5).0, 0);
+    // assert_eq!(gcd(5, 0).0, 0);
+    // assert_eq!(gcd(0, 0).0, 0);
+
+    for x in 0..42 {
+        for y in 0..42 {
+            let (res, (a, b))  = gcd(x, y) ;
+            let res = res as i64;
+            let x = x as i64;
+            let y = y as i64;
+            assert_eq!(res, a * x + b * y)
+        }
+    }
+}
+
+pub fn inverse_mod(x: u64, module: u64) -> Option<u64> {
+    let (g, (a, _)) = gcd(x % module, module);
+
+    if g != 1 { return None; }
+
+    let idk = a % module as i64;
+    let idk = if idk < 0 {
+        idk + module as i64
+    } else { idk};
+
+    Some(idk as u64)
+}
+
+#[test]
+fn test_inverse_mod() {
+    assert_eq!(inverse_mod(0, 5), None);
+    assert_eq!(inverse_mod(1, 5), Some(1));
+    assert_eq!(inverse_mod(2, 5), Some(3));
+    assert_eq!(inverse_mod(3, 5), Some(2));
+    assert_eq!(inverse_mod(4, 5), Some(4));
+
+    assert_eq!(inverse_mod(0, 6), None);
+    assert_eq!(inverse_mod(1, 6), Some(1));
+    assert_eq!(inverse_mod(2, 6), None);
+    assert_eq!(inverse_mod(3, 6), None);
+    assert_eq!(inverse_mod(4, 6), None);
+    assert_eq!(inverse_mod(5, 6), Some(5));
+
+    assert_eq!(inverse_mod(0, 9), None);
+    assert_eq!(inverse_mod(1, 9), Some(1));
+    assert_eq!(inverse_mod(2, 9), Some(5));
+    assert_eq!(inverse_mod(3, 9), None);
+    assert_eq!(inverse_mod(4, 9), Some(7));
+    assert_eq!(inverse_mod(5, 9), Some(2));
+    assert_eq!(inverse_mod(6, 9), None);
+    assert_eq!(inverse_mod(7, 9), Some(4));
+    assert_eq!(inverse_mod(8, 9), Some(8));
+
+    for x in 0..42 {
+        for m in 2..42 {
+            match inverse_mod(x, m) {
+                Some(i) => assert_eq!(x * i % m, 1),
+                None => {},
+            }
+        }
+    }
+}
+
