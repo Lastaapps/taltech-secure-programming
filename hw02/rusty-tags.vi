@@ -46,6 +46,7 @@ escaped_positional_derive	/home/petr/.cargo/registry/src/index.crates.io-6f17d22
 find	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_cookbook/mod.rs	/^pub mod find;$/;"	n
 git	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_cookbook/mod.rs	/^pub mod git;$/;"	n
 git_derive	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_cookbook/mod.rs	/^pub mod git_derive;$/;"	n
+host	/mnt/d/Dokumenty/Dokumenty/CVUT/2023-2024-Z/secure_programming/homeworks/hw02/src/main.rs	/^    host: String,$/;"	m	struct:Args
 is_error	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/exitcode-1.1.2/src/lib.rs	/^pub fn is_error(code: ExitCode) -> bool {$/;"	f
 is_success	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/exitcode-1.1.2/src/lib.rs	/^pub fn is_success(code: ExitCode) -> bool {$/;"	f
 main	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/bin/stdio-fixture.rs	/^fn main() {$/;"	f
@@ -53,9 +54,10 @@ main	/mnt/d/Dokumenty/Dokumenty/CVUT/2023-2024-Z/secure_programming/homeworks/hw
 multicall_busybox	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_cookbook/mod.rs	/^pub mod multicall_busybox;$/;"	n
 multicall_hostname	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_cookbook/mod.rs	/^pub mod multicall_hostname;$/;"	n
 pacman	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_cookbook/mod.rs	/^pub mod pacman;$/;"	n
+port	/mnt/d/Dokumenty/Dokumenty/CVUT/2023-2024-Z/secure_programming/homeworks/hw02/src/main.rs	/^    port: u16,$/;"	m	struct:Args
 repl	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_cookbook/mod.rs	/^pub mod repl;$/;"	n
-run_client	/mnt/d/Dokumenty/Dokumenty/CVUT/2023-2024-Z/secure_programming/homeworks/hw02/src/client.rs	/^pub fn run_client() -> Result<(), String> {$/;"	f
-run_server	/mnt/d/Dokumenty/Dokumenty/CVUT/2023-2024-Z/secure_programming/homeworks/hw02/src/server.rs	/^pub fn run_server() -> Result<(), String>{$/;"	f
+run_client	/mnt/d/Dokumenty/Dokumenty/CVUT/2023-2024-Z/secure_programming/homeworks/hw02/src/client.rs	/^pub fn run_client(host: &str, port: u16) -> Result<(), String> {$/;"	f
+run_server	/mnt/d/Dokumenty/Dokumenty/CVUT/2023-2024-Z/secure_programming/homeworks/hw02/src/server.rs	/^pub fn run_server(host: &str, port: u16) -> Result<(), String>{$/;"	f
 server	/mnt/d/Dokumenty/Dokumenty/CVUT/2023-2024-Z/secure_programming/homeworks/hw02/src/main.rs	/^    server: bool,$/;"	m	struct:Args
 server	/mnt/d/Dokumenty/Dokumenty/CVUT/2023-2024-Z/secure_programming/homeworks/hw02/src/main.rs	/^mod server;$/;"	n
 typed_derive	/home/petr/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap-4.4.5/src/_cookbook/mod.rs	/^pub mod typed_derive;$/;"	n

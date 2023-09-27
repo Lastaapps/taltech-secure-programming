@@ -20,6 +20,14 @@ struct Args {
     /// Run as client (Alice)
     #[arg(short, long, default_value_t = false)]
     client: bool,
+
+    /// Server address
+    #[arg(short, long, default_value_t = String::from("localhost"))]
+    host: String,
+
+    /// Server port number
+    #[arg(short, long, default_value_t = 42420)]
+    port: u16,
 }
 
 fn main() -> Result<(), String> {
@@ -31,9 +39,9 @@ fn main() -> Result<(), String> {
     };
 
     if args.server {
-        run_server()?;
+        run_server(&args.host, args.port)?;
     } else if args.client {
-        run_client()?;
+        run_client(&args.host, args.port)?;
     };
 
     Ok(())
