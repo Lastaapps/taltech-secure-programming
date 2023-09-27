@@ -2,12 +2,12 @@ use bit_vec::BitVec;
 use rand::Rng;
 
 pub fn sqruare_and_multiply_mod(base: u64, power: u64, modulo: u64) -> u64 {
-    if modulo < 2 {
-        panic!("Wtf, modulo < 2 ???");
-    }
-
+    let modulo = match modulo {
+        0 => 1u128 << 64,
+        1 => panic!("Wtf, modulo < 2 ???"),
+        _ => modulo as u128,
+    };
     let base = base as u128;
-    let modulo = modulo as u128;
 
     let mut acu = base % modulo;
     let mut res = 1u128;
@@ -111,7 +111,7 @@ pub fn random_prime() -> u64 {
             }
         }
 
-        if !miller_rabin_test_loop(number, 42) {
+        if !miller_rabin_test_loop(number, 420) {
             continue;
         }
 
@@ -278,4 +278,129 @@ fn test_miller_rabin_test() {
     assert!(!miller_rabin_test(5, 21));
     assert!(miller_rabin_test(5, 13));
     assert!(miller_rabin_test(7, 25)); // even though 25 is not a prime
+}
+
+#[allow(dead_code)]
+pub fn exp_cipher_encrypt(msg: &str, key: u64) -> Result<Vec<u8>, String> {
+    let mut data = msg.as_bytes().to_vec();
+    padding_add(&mut data)?;
+    exp_cipher_apply(&mut data, key)?;
+    Ok(data)
+}
+
+#[allow(dead_code)]
+pub fn exp_cipher_decrypt(mut data: Vec<u8>, key: u64) -> Result<String, String> {
+    padding_remove(&mut data)?;
+    exp_cipher_apply(&mut data, key)?;
+    let msg = String::from_utf8(data).map_err(|e| format!("Failed to decode UTF8 bytes: {}", e))?;
+    Ok(msg)
+}
+
+fn exp_cipher_apply(data: &mut [u8], key: u64) -> Result<(), String> {
+    if data.len() % 8 != 0 {
+        return Err("Wrong input buffer".into());
+    }
+
+    for i in (0..data.len()).step_by(8) {
+        println!("Before:");
+        for i in i..(i + 8) {
+            print!("{}, ", data[i]);
+        }
+        println!("");
+
+        // fuck Rust
+        let num = u64::from_be_bytes([
+            data[i + 0],
+            data[i + 1],
+            data[i + 2],
+            data[i + 3],
+            data[i + 4],
+            data[i + 5],
+            data[i + 6],
+            data[i + 7],
+        ]);
+        println!("num: {:#08x}", num);
+
+        let res = sqruare_and_multiply_mod(num, key, 0);
+        println!("res: {:#08x}", res);
+        let res = res.to_be_bytes();
+
+        for i in i..(i + 8) {
+            data[i] = res[i];
+        }
+
+        println!("After:");
+        for i in i..(i + 8) {
+            print!("{}, ", data[i]);
+        }
+        println!("");
+    }
+
+    Ok(())
+}
+
+fn padding_add(data: &mut Vec<u8>) -> Result<(), String> {
+    let padding = (8 - data.len() % 8) as u8;
+
+    let content = (padding << 4) + padding;
+    for _ in 0..padding {
+        data.push(content);
+    }
+
+    Ok(())
+}
+
+fn padding_remove(data: &mut Vec<u8>) -> Result<(), String> {
+    if data.len() % 8 != 0 {
+        return Err("Wrong buffer len on input".into());
+    }
+    if data.len() == 0 {
+        return Err("Empty buffer on input".into());
+    }
+
+    let padding = data.last().unwrap() >> 4;
+
+    for _ in 0..padding {
+        data.pop();
+    }
+
+    Ok(())
+}
+
+#[test]
+fn test_padding() -> Result<(), String> {
+    let mut data1 = Vec::<u8>::new();
+    let mut data2 = Vec::<u8>::new();
+
+    for i in 0..42 {
+        padding_add(&mut data1)?;
+        assert_eq!(data1.len() % 8, 0);
+
+        padding_remove(&mut data1)?;
+        assert_eq!(data1, data2);
+
+        data1.push(i);
+        data2.push(i);
+    }
+
+    Ok(())
+}
+
+// #[test]
+#[allow(dead_code)]
+fn test_exp_cipher() -> Result<(), String> {
+    let strings = ["", "a", "aa", "aaa", "aaaa", "aaaaa"];
+    let keys = [37, 59, 1001];
+
+    for key_encrypt in keys {
+        let key_decrypt = inverse_mod(key_encrypt, u64::MAX).unwrap();
+
+        for string in strings {
+            let data = exp_cipher_encrypt(string, key_encrypt)?;
+            let res = exp_cipher_decrypt(data, key_decrypt)?;
+            assert_eq!(string, res);
+        }
+    }
+
+    Ok(())
 }

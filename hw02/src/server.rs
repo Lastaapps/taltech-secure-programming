@@ -4,7 +4,10 @@ use std::{
 };
 
 use crate::{
-    algorithms::{random_undivisible_with, sqruare_and_multiply_mod},
+    algorithms::{
+        exp_cipher_decrypt, exp_cipher_encrypt, inverse_mod, random_undivisible_with,
+        sqruare_and_multiply_mod,
+    },
     network::{read_message, send_message, DHMessage},
 };
 
@@ -39,15 +42,36 @@ pub fn run_server(host: &str, port: u16) -> Result<(), String> {
     todo!()
 }
 
-fn handle_server(mut stream: TcpStream, name: &str) -> Result<(), String> {
-    stream.set_nodelay(true).unwrap();
+fn handle_server(mut tcp: TcpStream, name: &str) -> Result<(), String> {
+    tcp.set_nodelay(true).unwrap();
 
     msg(name, "Waiting for shared key");
 
-    let key = key_excahnge(&mut stream)?;
-    msg(name, &format!("The key is {}, but don't tell anybody", key));
+    let key_encrypt = key_excahnge(&mut tcp)?;
+    let key_dectypt = inverse_mod(key_encrypt, u64::MAX)
+        .ok_or_else(|| format!("You are out of luck, the key does not meet the requirement to use the cypher, try again"))?;
 
-    Ok(())
+    msg(
+        name,
+        &format!("The key is {}, but don't tell anybody", key_encrypt),
+    );
+
+    loop {
+        // receive
+        let data = if let DHMessage::Message { data } = read_message(&mut tcp)? {
+            data
+        } else {
+            return Err("Authorization message received, but comunication expected".into());
+        };
+
+        let text = exp_cipher_decrypt(data, key_dectypt)?;
+        let text = text.to_lowercase();
+        msg(name, &format!("Got: {}", text));
+
+        // send
+        let data = exp_cipher_encrypt(&text, key_encrypt)?;
+        send_message(&mut tcp, DHMessage::Message { data })?;
+    }
 }
 
 fn key_excahnge(tcp: &mut TcpStream) -> Result<u64, String> {
@@ -69,12 +93,12 @@ fn key_excahnge(tcp: &mut TcpStream) -> Result<u64, String> {
     send_message(tcp, DHMessage::ConnectionAck { public })?;
     let key = sqruare_and_multiply_mod(foreign_key, private, modulo);
 
-    // eprintln!("My private is: {}", private);
-    // eprintln!("My public is:  {}", public);
-    // eprintln!("Foreign is:    {}", foreign_key);
-    // eprintln!("Base is:       {}", base);
-    // eprintln!("Modulo is:     {}", modulo);
-    // eprintln!("Key is:        {}", key);
+    // eprintln!("My private:  {}", private);
+    // eprintln!("My public:   {}", public);
+    // eprintln!("Foreign:     {}", foreign_key);
+    // eprintln!("Base:        {}", base);
+    // eprintln!("Modulo:      {}", modulo);
+    // eprintln!("Encrypt key: {}", key);
 
     Ok(key)
 }

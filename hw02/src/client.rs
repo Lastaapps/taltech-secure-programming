@@ -1,7 +1,7 @@
-use std::net::TcpStream;
+use std::{net::TcpStream, io::stdin};
 
 use crate::{
-    algorithms::{random_prime, random_undivisible_with, sqruare_and_multiply_mod},
+    algorithms::{random_prime, random_undivisible_with, sqruare_and_multiply_mod, exp_cipher_encrypt, inverse_mod, exp_cipher_decrypt},
     network::{read_message, send_message, DHMessage},
 };
 
@@ -13,15 +13,37 @@ pub fn run_client(host: &str, port: u16) -> Result<(), String> {
     msg("Opening a stream");
 
     let address = format!("{}:{}", host, port);
-    let mut stream = TcpStream::connect(address)
+    let mut tcp = TcpStream::connect(address)
         .map_err(|e| format!("Failed to open a TCP connection: {}", e))?;
-    stream.set_nodelay(true).unwrap();
+    tcp.set_nodelay(true)
+        .map_err(|e| format!("Cannot set nodelay mode: {}", e))?;
 
-    let key = key_excahnge(&mut stream)?;
-    msg(&format!("The key is {}, but don't tell anybody", key));
+    let key_encrypt = key_excahnge(&mut tcp)?;
+    msg(&format!("The key is {}, but don't tell anybody", key_encrypt));
 
-    msg("All done, closing");
-    Ok(())
+    let key_dectypt = inverse_mod(key_encrypt, u64::MAX)
+        .ok_or_else(|| format!("You are out of luck, the key does not meet the requirement to use the cypher, try again"))?;
+
+    loop {
+        // send
+        let mut line = String::new();
+        stdin().read_line(&mut line)
+            .map_err(|e| format!("Failed to read a line from stdin: {}", e))?;
+
+        let data = exp_cipher_encrypt(&line, key_encrypt)?;
+        send_message(&mut tcp, DHMessage::Message { data: data })?;
+        msg("Data sent");
+
+        // receive
+        let data = if let DHMessage::Message { data } = read_message(&mut tcp)? {
+            data
+        } else {
+            return Err("Authoriaation message received, but comunication expected".into());
+        };
+
+        let text = exp_cipher_decrypt(data, key_dectypt)?;
+        msg(&format!("Got: {}", text));
+    };
 }
 
 fn key_excahnge(tcp: &mut TcpStream) -> Result<u64, String> {
@@ -50,12 +72,12 @@ fn key_excahnge(tcp: &mut TcpStream) -> Result<u64, String> {
 
     let key = sqruare_and_multiply_mod(foreign_key, private, modulo);
 
-    // eprintln!("My private is: {}", private);
-    // eprintln!("My public is:  {}", public);
-    // eprintln!("Foreign is:    {}", foreign_key);
-    // eprintln!("Base is:       {}", base);
-    // eprintln!("Modulo is:     {}", modulo);
-    // eprintln!("Key is:        {}", key);
+    // eprintln!("My private:  {}", private);
+    // eprintln!("My public:   {}", public);
+    // eprintln!("Foreign:     {}", foreign_key);
+    // eprintln!("Base:        {}", base);
+    // eprintln!("Modulo:      {}", modulo);
+    // eprintln!("Encrypt key: {}", key);
 
     Ok(key)
 }
