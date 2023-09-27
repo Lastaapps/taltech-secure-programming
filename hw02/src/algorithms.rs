@@ -1,5 +1,6 @@
 use bit_vec::BitVec;
 use rand::Rng;
+use seeded_random::Random;
 
 pub fn sqruare_and_multiply_mod(base: u64, power: u64, modulo: u64) -> u64 {
     let modulo = match modulo {
@@ -280,6 +281,34 @@ fn test_miller_rabin_test() {
     assert!(miller_rabin_test(7, 25)); // even though 25 is not a prime
 }
 
+pub fn prng_cipher_encrypt(msg: &str, prng: &Random) -> Result<Vec<u8>, String> {
+    let mut data = msg.as_bytes().to_vec();
+    padding_add(&mut data)?;
+    prng_cipher_apply(&mut data, prng)?;
+    Ok(data)
+}
+
+pub fn prng_cipher_decrypt(mut data: Vec<u8>, prng: &Random) -> Result<String, String> {
+    padding_remove(&mut data)?;
+    prng_cipher_apply(&mut data, prng)?;
+    let msg = String::from_utf8(data).map_err(|e| format!("Failed to decode UTF8 bytes: {}", e))?;
+    Ok(msg)
+}
+
+fn prng_cipher_apply(data: &mut [u8], prng: &Random) -> Result<(), String> {
+    // if data.len() % 8 != 0 {
+    //     return Err("Wrong input buffer length".into());
+    // }
+
+    let _ = data.into_iter()
+        .map(|b| {
+            let code : u8 = prng.gen();
+            *b ^= code;
+        });
+
+    Ok(())
+}
+
 #[allow(dead_code)]
 pub fn exp_cipher_encrypt(msg: &str, key: u64) -> Result<Vec<u8>, String> {
     let mut data = msg.as_bytes().to_vec();
@@ -302,12 +331,6 @@ fn exp_cipher_apply(data: &mut [u8], key: u64) -> Result<(), String> {
     }
 
     for i in (0..data.len()).step_by(8) {
-        println!("Before:");
-        for i in i..(i + 8) {
-            print!("{}, ", data[i]);
-        }
-        println!("");
-
         // fuck Rust
         let num = u64::from_be_bytes([
             data[i + 0],
@@ -319,21 +342,13 @@ fn exp_cipher_apply(data: &mut [u8], key: u64) -> Result<(), String> {
             data[i + 6],
             data[i + 7],
         ]);
-        println!("num: {:#08x}", num);
 
         let res = sqruare_and_multiply_mod(num, key, 0);
-        println!("res: {:#08x}", res);
         let res = res.to_be_bytes();
 
         for i in i..(i + 8) {
             data[i] = res[i];
         }
-
-        println!("After:");
-        for i in i..(i + 8) {
-            print!("{}, ", data[i]);
-        }
-        println!("");
     }
 
     Ok(())

@@ -3,10 +3,11 @@ use std::{
     thread,
 };
 
+use seeded_random::{Random, Seed};
+
 use crate::{
     algorithms::{
-        exp_cipher_decrypt, exp_cipher_encrypt, inverse_mod, random_undivisible_with,
-        sqruare_and_multiply_mod,
+        prng_cipher_decrypt, prng_cipher_encrypt, random_undivisible_with, sqruare_and_multiply_mod,
     },
     network::{read_message, send_message, DHMessage},
 };
@@ -47,14 +48,10 @@ fn handle_server(mut tcp: TcpStream, name: &str) -> Result<(), String> {
 
     msg(name, "Waiting for shared key");
 
-    let key_encrypt = key_excahnge(&mut tcp)?;
-    let key_dectypt = inverse_mod(key_encrypt, u64::MAX)
-        .ok_or_else(|| format!("You are out of luck, the key does not meet the requirement to use the cypher, try again"))?;
+    let key = key_excahnge(&mut tcp)?;
+    let prng = Random::from_seed(Seed::unsafe_new(key));
 
-    msg(
-        name,
-        &format!("The key is {}, but don't tell anybody", key_encrypt),
-    );
+    msg(name, &format!("The key is {}, but don't tell anybody", key));
 
     loop {
         // receive
@@ -64,14 +61,20 @@ fn handle_server(mut tcp: TcpStream, name: &str) -> Result<(), String> {
             return Err("Authorization message received, but comunication expected".into());
         };
 
-        let text = exp_cipher_decrypt(data, key_dectypt)?;
-        let text = text.to_lowercase();
+        let text = prng_cipher_decrypt(data, &prng)?;
+
+        let text = process_string(&text);
+
         msg(name, &format!("Got: {}", text));
 
         // send
-        let data = exp_cipher_encrypt(&text, key_encrypt)?;
+        let data = prng_cipher_encrypt(&text, &prng)?;
         send_message(&mut tcp, DHMessage::Message { data })?;
     }
+}
+
+fn process_string(text : &str) -> String {
+    text.chars().rev().collect()
 }
 
 fn key_excahnge(tcp: &mut TcpStream) -> Result<u64, String> {

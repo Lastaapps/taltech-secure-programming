@@ -1,7 +1,12 @@
-use std::{net::TcpStream, io::stdin};
+use std::{io::stdin, net::TcpStream};
+
+use seeded_random::{Random, Seed};
 
 use crate::{
-    algorithms::{random_prime, random_undivisible_with, sqruare_and_multiply_mod, exp_cipher_encrypt, inverse_mod, exp_cipher_decrypt},
+    algorithms::{
+        prng_cipher_decrypt, prng_cipher_encrypt, random_prime, random_undivisible_with,
+        sqruare_and_multiply_mod,
+    },
     network::{read_message, send_message, DHMessage},
 };
 
@@ -18,32 +23,32 @@ pub fn run_client(host: &str, port: u16) -> Result<(), String> {
     tcp.set_nodelay(true)
         .map_err(|e| format!("Cannot set nodelay mode: {}", e))?;
 
-    let key_encrypt = key_excahnge(&mut tcp)?;
-    msg(&format!("The key is {}, but don't tell anybody", key_encrypt));
+    let key = key_excahnge(&mut tcp)?;
+    let prng = Random::from_seed(Seed::unsafe_new(key));
 
-    let key_dectypt = inverse_mod(key_encrypt, u64::MAX)
-        .ok_or_else(|| format!("You are out of luck, the key does not meet the requirement to use the cypher, try again"))?;
+    msg(&format!("The key is {}, but don't tell anybody", key));
 
     loop {
         // send
         let mut line = String::new();
-        stdin().read_line(&mut line)
+        stdin()
+            .read_line(&mut line)
             .map_err(|e| format!("Failed to read a line from stdin: {}", e))?;
 
-        let data = exp_cipher_encrypt(&line, key_encrypt)?;
-        send_message(&mut tcp, DHMessage::Message { data: data })?;
+        let data = prng_cipher_encrypt(line.trim(), &prng)?;
+        send_message(&mut tcp, DHMessage::Message { data })?;
         msg("Data sent");
 
         // receive
         let data = if let DHMessage::Message { data } = read_message(&mut tcp)? {
             data
         } else {
-            return Err("Authoriaation message received, but comunication expected".into());
+            return Err("Authorization message received, but comunication expected".into());
         };
 
-        let text = exp_cipher_decrypt(data, key_dectypt)?;
+        let text = prng_cipher_decrypt(data, &prng)?;
         msg(&format!("Got: {}", text));
-    };
+    }
 }
 
 fn key_excahnge(tcp: &mut TcpStream) -> Result<u64, String> {
