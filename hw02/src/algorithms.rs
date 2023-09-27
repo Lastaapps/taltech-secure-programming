@@ -1,4 +1,3 @@
-
 use bit_vec::BitVec;
 use rand::Rng;
 
@@ -115,4 +114,3 @@ pub fn random_prime() -> u64 {
         break number;
     }
 }
-

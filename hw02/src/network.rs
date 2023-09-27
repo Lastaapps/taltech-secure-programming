@@ -1,8 +1,8 @@
+use base64::{engine::general_purpose, Engine as _};
 use std::{
     io::{Read, Write},
     net::TcpStream,
 };
-use base64::{Engine as _, engine::general_purpose};
 
 pub enum DHMessage {
     ConnectionProposal { base: u64, modulo: u64, public: u64 },
@@ -12,16 +12,18 @@ pub enum DHMessage {
 
 pub fn send_message(tcp: &mut TcpStream, msg: DHMessage) -> Result<(), String> {
     match msg {
-        DHMessage::ConnectionProposal { base, modulo, public } => {
-            tcp.write_all(format!("DHSYN {} {} {}\n", base, modulo, public).as_bytes())
-        }
+        DHMessage::ConnectionProposal {
+            base,
+            modulo,
+            public,
+        } => tcp.write_all(format!("DHSYN {} {} {}\n", base, modulo, public).as_bytes()),
         DHMessage::ConnectionAck { public } => {
             tcp.write_all(format!("DHACK {}\n", public).as_bytes())
         }
         DHMessage::Message { data } => {
             let msg = general_purpose::STANDARD_NO_PAD.encode(data);
             tcp.write_all(format!("DHMSG {}\n", msg).as_bytes())
-        },
+        }
     }
     .map_err(|e| format!("Failed to send bytes: {}", e))
 }
@@ -35,7 +37,11 @@ pub fn read_message(tcp: &mut TcpStream) -> Result<DHMessage, String> {
             let modulo = read_number(tcp)?;
             let public = read_number(tcp)?;
 
-            DHMessage::ConnectionProposal { base, modulo, public }
+            DHMessage::ConnectionProposal {
+                base,
+                modulo,
+                public,
+            }
         }
         "DHACK" => {
             let public = read_number(tcp)?;
@@ -43,7 +49,8 @@ pub fn read_message(tcp: &mut TcpStream) -> Result<DHMessage, String> {
         }
         "DHMSG" => {
             let encoded = read_till_space(tcp, 2usize.pow(24))?;
-            let bytes = general_purpose::STANDARD_NO_PAD.decode(encoded)
+            let bytes = general_purpose::STANDARD_NO_PAD
+                .decode(encoded)
                 .map_err(|e| format!("Failed to decode base64 encrypted message: {}", e))?;
             DHMessage::Message { data: bytes }
         }

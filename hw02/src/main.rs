@@ -1,8 +1,7 @@
-
-mod client;
 mod algorithms;
-mod server;
+mod client;
 mod network;
+mod server;
 
 extern crate exitcode;
 
@@ -47,4 +46,3 @@ fn main() -> Result<(), String> {
 
     Ok(())
 }
-

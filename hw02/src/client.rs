@@ -1,7 +1,10 @@
-use std::net::TcpStream;
 use rand::Rng;
+use std::net::TcpStream;
 
-use crate::{algorithms::{random_prime, sqruare_and_multiply_mod}, network::{send_message, DHMessage, read_message}};
+use crate::{
+    algorithms::{random_prime, sqruare_and_multiply_mod},
+    network::{read_message, send_message, DHMessage},
+};
 
 fn msg(msg: &str) {
     println!("server> {}", msg)
@@ -31,11 +34,20 @@ fn key_excahnge(tcp: &mut TcpStream) -> Result<u64, String> {
     let private: u64 = rng.gen(); // TODO check gcd(private, prime - 1) == 1
     let public = sqruare_and_multiply_mod(base, private, modulo);
 
-    send_message(tcp, DHMessage::ConnectionProposal { base, modulo, public })?;
+    send_message(
+        tcp,
+        DHMessage::ConnectionProposal {
+            base,
+            modulo,
+            public,
+        },
+    )?;
 
     let foreign_key = match read_message(tcp)? {
         DHMessage::ConnectionAck { public } => public,
-        DHMessage::ConnectionProposal { .. } => return Err("Proposal is not a valid message for a client".into()),
+        DHMessage::ConnectionProposal { .. } => {
+            return Err("Proposal is not a valid message for a client".into())
+        }
         DHMessage::Message { data } => todo!("Not ready yet: {}", data.len()),
     };
 
@@ -50,4 +62,3 @@ fn key_excahnge(tcp: &mut TcpStream) -> Result<u64, String> {
 
     Ok(key)
 }
-
