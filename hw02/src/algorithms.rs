@@ -300,11 +300,10 @@ fn prng_cipher_apply(data: &mut [u8], prng: &Random) -> Result<(), String> {
     //     return Err("Wrong input buffer length".into());
     // }
 
-    let _ = data.into_iter()
-        .map(|b| {
-            let code : u8 = prng.gen();
-            *b ^= code;
-        });
+    let _ = data.iter_mut().map(|b| {
+        let code: u8 = prng.gen();
+        *b ^= code;
+    });
 
     Ok(())
 }
@@ -333,7 +332,7 @@ fn exp_cipher_apply(data: &mut [u8], key: u64) -> Result<(), String> {
     for i in (0..data.len()).step_by(8) {
         // fuck Rust
         let num = u64::from_be_bytes([
-            data[i + 0],
+            data[i],
             data[i + 1],
             data[i + 2],
             data[i + 3],
@@ -346,9 +345,7 @@ fn exp_cipher_apply(data: &mut [u8], key: u64) -> Result<(), String> {
         let res = sqruare_and_multiply_mod(num, key, 0);
         let res = res.to_be_bytes();
 
-        for i in i..(i + 8) {
-            data[i] = res[i];
-        }
+        data[i..(i + 8)].copy_from_slice(&res[i..(i + 8)]);
     }
 
     Ok(())
@@ -369,7 +366,7 @@ fn padding_remove(data: &mut Vec<u8>) -> Result<(), String> {
     if data.len() % 8 != 0 {
         return Err("Wrong buffer len on input".into());
     }
-    if data.len() == 0 {
+    if data.is_empty() {
         return Err("Empty buffer on input".into());
     }
 

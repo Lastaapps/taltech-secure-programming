@@ -73,7 +73,7 @@ fn handle_server(mut tcp: TcpStream, name: &str) -> Result<(), String> {
     }
 }
 
-fn process_string(text : &str) -> String {
+fn process_string(text: &str) -> String {
     text.chars().rev().collect()
 }
 
