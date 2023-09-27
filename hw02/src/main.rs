@@ -1,7 +1,8 @@
 
 mod client;
-mod common;
+mod algorithms;
 mod server;
+mod structures;
 
 extern crate exitcode;
 
@@ -22,11 +23,11 @@ struct Args {
     client: bool,
 
     /// Server address
-    #[arg(short, long, default_value_t = String::from("localhost"))]
+    #[arg(long, default_value_t = String::from("localhost"))]
     host: String,
 
     /// Server port number
-    #[arg(short, long, default_value_t = 42420)]
+    #[arg(long, default_value_t = 42420)]
     port: u16,
 }
 
