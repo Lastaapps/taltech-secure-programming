@@ -1,3 +1,4 @@
+
 use bit_vec::BitVec;
 use rand::Rng;
 
@@ -6,8 +7,11 @@ pub fn sqruare_and_multiply_mod(base: u64, power: u64, modulo: u64) -> u64 {
         panic!("Wtf, modulo < 2 ???");
     }
 
-    let mut acu = base % modulo;
-    let mut res = 1;
+    let base = base as u128;
+    let modulo = modulo as u128;
+
+    let mut acu = (base % modulo) as u128;
+    let mut res = 1u128;
     let mut power = power;
 
     while power > 0 {
@@ -21,7 +25,7 @@ pub fn sqruare_and_multiply_mod(base: u64, power: u64, modulo: u64) -> u64 {
         power >>= 1;
     }
 
-    return res;
+    return res as u64;
 }
 
 #[test]
@@ -65,6 +69,10 @@ pub fn sieve_of_eratosthenes(limit: u64) -> Vec<u64> {
         let val = (i * 2 + 1) as u64;
         out.push(val);
 
+        if out.len() % 1000 == 0 {
+            println!("Found {}, got {}", val, out.len());
+        }
+
         if val > fill_limit {
             continue;
         };
@@ -90,9 +98,11 @@ fn test_sieve_of_eratosthenes() {
     assert_ne!(sieve_of_eratosthenes(258), primes);
 }
 
-fn random_prime() -> u64 {
+pub fn random_prime() -> u64 {
     let mut rng = rand::thread_rng();
-    let primes = sieve_of_eratosthenes(/*2f64.powi(64).sqrt() as u64*/ 2u64.pow(32));
+    // TODO do statistical tests
+    // let primes = sieve_of_eratosthenes(/*2f64.powi(64).sqrt() as u64*/ 2u64.pow(32));
+    let primes = sieve_of_eratosthenes(/*2f64.powi(64).sqrt() as u64*/ 2u64.pow(16));
 
     'main: loop {
         let number: u64 = rng.gen();
@@ -109,3 +119,4 @@ fn random_prime() -> u64 {
         break number;
     }
 }
+

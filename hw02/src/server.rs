@@ -10,6 +10,10 @@
 
 use std::{net::{TcpListener, TcpStream}, thread};
 
+use rand::Rng;
+
+use crate::{network::{DHMessage, send_message, read_message}, algorithms::sqruare_and_multiply_mod};
+
 fn msg(name: &str, msg: &str) {
     println!("{}> {}", name, msg)
 }
@@ -22,6 +26,7 @@ pub fn run_server(host: &str, port: u16) -> Result<(), String>{
 
     let mut counter = 0;
 
+    msg("server", "Waiting for connections...");
     for stream in listener.incoming() {
         let name = format!("client{}", counter);
         counter += 1;
@@ -29,7 +34,12 @@ pub fn run_server(host: &str, port: u16) -> Result<(), String>{
         let stream = stream.unwrap();
         thread::spawn(move || {
             msg(&name, "Connection established!");
-            handle_server(stream, &name);
+
+            match handle_server(stream, &name) {
+                Ok(_) => {},
+                Err(e) => {eprintln!("{}", e)},
+            }
+
             msg(&name, "Connection closed!");
         });
     };
@@ -37,99 +47,37 @@ pub fn run_server(host: &str, port: u16) -> Result<(), String>{
     todo!()
 }
 
-fn handle_server(mut stream: TcpStream, name: &str) {
+fn handle_server(mut stream: TcpStream, name: &str) -> Result<(), String> {
     stream.set_nodelay(true).unwrap();
 
     msg(name, "Waiting for shared key");
+
+    let key = key_excahnge(&mut stream)?;
+    msg(name, &format!("The key is {}, but don't tell anybody", key));
+
+    Ok(())
 }
 
-// fn check_max_len_overflow(max_len: usize, message: &Vec<u8>) -> bool {
-//     let len = message.len();
-//     (max_len - 2 < len) && !(message[max_len - 2] == 7u8 && max_len - 1 == len)
-// }
+fn key_excahnge(tcp: &mut TcpStream) -> Result<u64, String> {
+    let mut rng = rand::thread_rng();
+    let private: u64 = rng.gen();
+    let public: u64 = rng.gen();
 
-// fn prefix_match(msg1: &Vec<u8>, msg2: &Vec<u8>) -> bool {
-//     let len = min(msg1.len(), msg2.len());
-//     for i in 0..len {
-//         if msg1[i] != msg2[i] {
-//             return false
-//         }
-//     }
-//     true
-// }
+    send_message(tcp, DHMessage::ConnectionAck { public_key: public })?;
 
-// fn read_message(stream: &mut TcpStream, max_len: usize) -> Result<ClientMessage, BError> {
-//     let mut message = Vec::<u8>::new();
-//     let recharching_bytes = "RECHARGING".as_bytes().to_vec();
-//     let full_power_bytes = "FULL POWER".as_bytes().to_vec();
+    let (foreign_key, prime) = match read_message(tcp)? {
+        DHMessage::ConnectionProposal { public_key, modulo } => (public_key, modulo),
+        DHMessage::ConnectionAck { .. } => return Err("Ack is not a valid message for a server".into()),
+        DHMessage::Message { data } => todo!("Not ready yet: {}", data.len()),
+    };
 
-//     loop {
-//         let is_normal_overflow = check_max_len_overflow(max_len, &message);
-//         let is_charging = !check_max_len_overflow(12, &message) && 
-//             (prefix_match(&message, &recharching_bytes)
-//              || prefix_match(&message, &full_power_bytes));
+    println!("My private is: {}", private);
+    println!("My public is:  {}", public);
+    println!("Foreign is:    {}", foreign_key);
+    println!("Modulo is:     {}", prime);
 
-//         if is_normal_overflow && !is_charging {
-//             let len = message.len();
-//             return Err(BError::MessageToLong(String::from_utf8(message).unwrap(), len));
-//         }
-
-//         let mut bytes = [0; 1];
-//         let bytes_num = unwrap_io(stream.read(&mut bytes))?;
-//         if bytes_num == 0 {
-//             return Err(BError::ConnectionClosed);
-//         }
-
-//         let byte = bytes[0];
-//         if byte == 8u8 { // \b
-//             if let Some(last) = message.last() {
-//                 if last == &7u8 {
-//                     message.pop();
-//                     let str = String::from_utf8(message).unwrap();
-//                     println!("> Read: {}", str);
-//                     return Ok(ClientMessage(str));
-//                 }
-//             }
-//         }
-
-//         // println!("? Push: {} - {}", byte, String::from_utf8(bytes.to_vec()).unwrap());
-//         message.push(byte)
-//     }
-// }
-
-// fn unwrap_io<T>(res: Result<T, std::io::Error>) -> Result<T, BError> {
-//     match res {
-//         Ok(data) => Ok(data),
-//         Err(e) => Err(BError::Io(e)),
-//     }
-// }
-
-// fn server_send_message(stream: &mut TcpStream, message: ServerMessage) {
-//     let payload = message.to_payload();
-
-//     let str = String::from_utf8(payload.clone()).unwrap();
-//     println!("# Send: {}", str);
-
-//     stream.write_all(&payload).unwrap();
-// }
-
-// fn server_send_error(stream: &mut TcpStream, error : BError) {
-
-//     println!("Error: {:?}", error);
-
-//     if error.should_send() {
-//         let to_send = error.server_response();
-//         server_send_message(stream, to_send);
-//     }
-
-//     server_shutdown(stream);
-// }
-
-// fn server_shutdown(stream: &TcpStream) {
-//     println!("Stopping a stream");
-//     match stream.shutdown(std::net::Shutdown::Both) {
-//         Ok(_) => {}
-//         Err(e) => println!("Server didn't shudown as expected: {}", e),
-//     }
-// }
+    let key = sqruare_and_multiply_mod(private, public, prime);
+    let key = sqruare_and_multiply_mod(key, foreign_key, prime);
+    Ok(key)
+}
 

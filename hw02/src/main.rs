@@ -2,7 +2,7 @@
 mod client;
 mod algorithms;
 mod server;
-mod structures;
+mod network;
 
 extern crate exitcode;
 
