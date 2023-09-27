@@ -1,3 +1,5 @@
+use bit_vec::BitVec;
+
 pub fn sqruare_and_multiply_mod(base: u64, power: u64, modulo: u64) -> u64 {
     if modulo < 2 {
         panic!("Wtf, modulo < 2 ???");
@@ -43,4 +45,46 @@ fn test_sqruare_and_multiply_mod() {
     assert_eq!(samm(3, 5, 7), 5);
     assert_eq!(samm(3, 6, 7), 1);
     assert_eq!(samm(3, 7, 7), 3);
+}
+
+/// Find all the primes up to the limit (excluding)
+pub fn sieve_of_eratosthenes(limit: u64) -> Vec<u64> {
+    let mut out = Vec::<u64>::with_capacity((limit as f64 / (limit as f64).ln()) as usize);
+
+    let mut data = BitVec::from_elem((limit / 2).try_into().unwrap(), false);
+    data.set(0, true); // disable 1
+    out.push(2);
+
+    let fill_limit: u64 = (limit as f64).sqrt() as u64 + 1;
+    for i in 0..data.len() {
+        if data[i] {
+            continue;
+        }
+
+        let val = (i * 2 + 1) as u64;
+        out.push(val);
+
+        if val > fill_limit {
+            continue;
+        };
+
+        for j in (((val * val - 1) as usize / 2)..data.len()).step_by(val as usize) {
+            data.set(j, true);
+        }
+    }
+
+    return out;
+}
+
+#[test]
+fn test_sieve_of_eratosthenes() {
+    let primes = [
+        2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89,
+        97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181,
+        191, 193, 197, 199, 211, 223, 227, 229, 233, 239, 241, 251,
+    ];
+    assert_eq!(sieve_of_eratosthenes(255), primes);
+    assert_eq!(sieve_of_eratosthenes(256), primes);
+    assert_eq!(sieve_of_eratosthenes(257), primes);
+    assert_ne!(sieve_of_eratosthenes(258), primes);
 }
