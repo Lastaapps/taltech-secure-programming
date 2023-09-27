@@ -10,7 +10,7 @@ pub fn sqruare_and_multiply_mod(base: u64, power: u64, modulo: u64) -> u64 {
     let base = base as u128;
     let modulo = modulo as u128;
 
-    let mut acu = (base % modulo) as u128;
+    let mut acu = base % modulo;
     let mut res = 1u128;
     let mut power = power;
 
@@ -25,7 +25,7 @@ pub fn sqruare_and_multiply_mod(base: u64, power: u64, modulo: u64) -> u64 {
         power >>= 1;
     }
 
-    return res as u64;
+    res as u64
 }
 
 #[test]
@@ -69,10 +69,6 @@ pub fn sieve_of_eratosthenes(limit: u64) -> Vec<u64> {
         let val = (i * 2 + 1) as u64;
         out.push(val);
 
-        if out.len() % 1000 == 0 {
-            println!("Found {}, got {}", val, out.len());
-        }
-
         if val > fill_limit {
             continue;
         };
@@ -82,7 +78,7 @@ pub fn sieve_of_eratosthenes(limit: u64) -> Vec<u64> {
         }
     }
 
-    return out;
+    out
 }
 
 #[test]

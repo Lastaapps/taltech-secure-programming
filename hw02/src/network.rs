@@ -5,25 +5,25 @@ use std::{
 use base64::{Engine as _, engine::general_purpose};
 
 pub enum DHMessage {
-    ConnectionProposal { public_key: u64, modulo: u64 },
-    ConnectionAck { public_key: u64 },
+    ConnectionProposal { base: u64, modulo: u64, public: u64 },
+    ConnectionAck { public: u64 },
     Message { data: Vec<u8> },
 }
 
 pub fn send_message(tcp: &mut TcpStream, msg: DHMessage) -> Result<(), String> {
-    Ok(match msg {
-        DHMessage::ConnectionProposal { public_key, modulo } => {
-            tcp.write_all(format!("DHSYN {} {}\n", public_key, modulo).as_bytes())
+    match msg {
+        DHMessage::ConnectionProposal { base, modulo, public } => {
+            tcp.write_all(format!("DHSYN {} {} {}\n", base, modulo, public).as_bytes())
         }
-        DHMessage::ConnectionAck { public_key } => {
-            tcp.write_all(format!("DHACK {}\n", public_key).as_bytes())
+        DHMessage::ConnectionAck { public } => {
+            tcp.write_all(format!("DHACK {}\n", public).as_bytes())
         }
         DHMessage::Message { data } => {
             let msg = general_purpose::STANDARD_NO_PAD.encode(data);
             tcp.write_all(format!("DHMSG {}\n", msg).as_bytes())
         },
     }
-    .map_err(|e| format!("Failed to send bytes: {}", e))?)
+    .map_err(|e| format!("Failed to send bytes: {}", e))
 }
 
 pub fn read_message(tcp: &mut TcpStream) -> Result<DHMessage, String> {
@@ -31,16 +31,15 @@ pub fn read_message(tcp: &mut TcpStream) -> Result<DHMessage, String> {
 
     let msg = match msg.as_str() {
         "DHSYN" => {
-            let public = read_number(tcp)?;
+            let base = read_number(tcp)?;
             let modulo = read_number(tcp)?;
-            DHMessage::ConnectionProposal {
-                public_key: public,
-                modulo: modulo,
-            }
+            let public = read_number(tcp)?;
+
+            DHMessage::ConnectionProposal { base, modulo, public }
         }
         "DHACK" => {
             let public = read_number(tcp)?;
-            DHMessage::ConnectionAck { public_key: public }
+            DHMessage::ConnectionAck { public }
         }
         "DHMSG" => {
             let encoded = read_till_space(tcp, 2usize.pow(24))?;

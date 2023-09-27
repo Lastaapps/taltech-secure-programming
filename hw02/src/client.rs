@@ -24,27 +24,30 @@ pub fn run_client(host: &str, port: u16) -> Result<(), String> {
 
 fn key_excahnge(tcp: &mut TcpStream) -> Result<u64, String> {
     let mut rng = rand::thread_rng();
-    let private: u64 = rng.gen();
-    let public: u64 = rng.gen();
 
-    msg("Finding a prime");
-    let prime = random_prime();
+    let modulo = random_prime();
+    let base: u64 = rng.gen();
 
-    send_message(tcp, DHMessage::ConnectionProposal { public_key: public, modulo: prime })?;
+    let private: u64 = rng.gen(); // TODO check gcd(private, prime - 1) == 1
+    let public = sqruare_and_multiply_mod(base, private, modulo);
 
-    let foreign_key: u64 = match read_message(tcp)? {
-        DHMessage::ConnectionAck { public_key } => public_key,
+    send_message(tcp, DHMessage::ConnectionProposal { base, modulo, public })?;
+
+    let foreign_key = match read_message(tcp)? {
+        DHMessage::ConnectionAck { public } => public,
         DHMessage::ConnectionProposal { .. } => return Err("Proposal is not a valid message for a client".into()),
         DHMessage::Message { data } => todo!("Not ready yet: {}", data.len()),
     };
 
-    println!("My private is: {}", private);
-    println!("My public is:  {}", public);
-    println!("Foreign is:    {}", foreign_key);
-    println!("Modulo is:     {}", prime);
+    let key = sqruare_and_multiply_mod(foreign_key, private, modulo);
 
-    let key = sqruare_and_multiply_mod(private, public, prime);
-    let key = sqruare_and_multiply_mod(key, foreign_key, prime);
+    // eprintln!("My private is: {}", private);
+    // eprintln!("My public is:  {}", public);
+    // eprintln!("Foreign is:    {}", foreign_key);
+    // eprintln!("Base is:       {}", base);
+    // eprintln!("Modulo is:     {}", modulo);
+    // eprintln!("Key is:        {}", key);
+
     Ok(key)
 }
 
