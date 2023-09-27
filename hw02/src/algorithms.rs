@@ -95,9 +95,8 @@ fn test_sieve_of_eratosthenes() {
 
 pub fn random_prime() -> u64 {
     let mut rng = rand::thread_rng();
-    // TODO do statistical tests
-    // let primes = sieve_of_eratosthenes(/*2f64.powi(64).sqrt() as u64*/ 2u64.pow(32));
-    let primes = sieve_of_eratosthenes(/*2f64.powi(64).sqrt() as u64*/ 2u64.pow(16));
+    let prime_no_limit = 2u64.pow(16);
+    let primes = sieve_of_eratosthenes(prime_no_limit);
 
     'main: loop {
         let number: u64 = rng.gen();
@@ -111,6 +110,11 @@ pub fn random_prime() -> u64 {
                 continue 'main;
             }
         }
+
+        if !miller_rabin_test_loop(number, 42) {
+            continue;
+        }
+
         break number;
     }
 }
@@ -133,7 +137,6 @@ pub fn gcd(x: u64, y: u64) -> (u64, (i64, i64)) {
 
 #[test]
 fn test_gcd() {
-
     assert_eq!(gcd(2, 5), (1, (-2, 1)));
     assert_eq!(gcd(5, 2), (1, (1, -2)));
 
@@ -152,7 +155,7 @@ fn test_gcd() {
 
     for x in 0..42 {
         for y in 0..42 {
-            let (res, (a, b))  = gcd(x, y) ;
+            let (res, (a, b)) = gcd(x, y);
             let res = res as i64;
             let x = x as i64;
             let y = y as i64;
@@ -164,12 +167,12 @@ fn test_gcd() {
 pub fn inverse_mod(x: u64, module: u64) -> Option<u64> {
     let (g, (a, _)) = gcd(x % module, module);
 
-    if g != 1 { return None; }
+    if g != 1 {
+        return None;
+    }
 
     let idk = a % module as i64;
-    let idk = if idk < 0 {
-        idk + module as i64
-    } else { idk};
+    let idk = if idk < 0 { idk + module as i64 } else { idk };
 
     Some(idk as u64)
 }
@@ -201,9 +204,8 @@ fn test_inverse_mod() {
 
     for x in 0..42 {
         for m in 2..42 {
-            match inverse_mod(x, m) {
-                Some(i) => assert_eq!(x * i % m, 1),
-                None => {},
+            if let Some(i) = inverse_mod(x, m) {
+                assert_eq!(x * i % m, 1);
             }
         }
     }
@@ -225,3 +227,55 @@ pub fn random_undivisible_with(m: u64) -> u64 {
     }
 }
 
+/// return false if the number is compounded for sure
+fn miller_rabin_test_loop(num: u64, iteration: usize) -> bool {
+    for _ in 0..iteration {
+        let victim = rand::thread_rng().gen();
+        if !miller_rabin_test(victim, num) {
+            return false;
+        }
+    }
+    true
+}
+
+/// Runs Miller-Rabin test for prime numbers
+/// @param a - chosen victim
+/// @param p - prime to test
+/// @return false if the number is not prime for sure
+fn miller_rabin_test(a: u64, p: u64) -> bool {
+    // p - 1 = 2^b * m
+    let (b, m) = {
+        let mut m = p - 1;
+        let mut b = 0;
+        while m % 2 != 0 {
+            m /= 2;
+            b += 1;
+        }
+        (b, m)
+    };
+
+    let mut am = sqruare_and_multiply_mod(a, m, p) as u128;
+    if am == 1 {
+        return true;
+    }
+
+    let p = p as u128;
+    let target = p - 1;
+
+    for _ in 0..b {
+        if am == target {
+            return true;
+        }
+        am *= am;
+        am %= p;
+    }
+
+    false
+}
+
+#[test]
+fn test_miller_rabin_test() {
+    assert!(!miller_rabin_test(5, 21));
+    assert!(miller_rabin_test(5, 13));
+    assert!(miller_rabin_test(7, 25)); // even though 25 is not a prime
+}

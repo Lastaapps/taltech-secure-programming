@@ -1,7 +1,7 @@
 use std::net::TcpStream;
 
 use crate::{
-    algorithms::{random_prime, sqruare_and_multiply_mod, random_undivisible_with},
+    algorithms::{random_prime, random_undivisible_with, sqruare_and_multiply_mod},
     network::{read_message, send_message, DHMessage},
 };
 
