@@ -2,12 +2,15 @@ mod algorithms;
 mod client;
 mod network;
 mod server;
+mod cracker;
 
 extern crate exitcode;
 
 use clap::Parser;
 use client::run_client;
 use server::run_server;
+
+use crate::cracker::run_cracker;
 
 /// Diffie–Hellman key exchange
 #[derive(Parser, Debug)]
@@ -33,7 +36,7 @@ struct Args {
 fn main() -> Result<(), String> {
     let args = Args::parse();
 
-    if (args.server && args.client) || (!args.server && !args.client) {
+    if args.server && args.client  {
         eprintln!("You need to run in either server (Bob) or client (Alice) mode.");
         std::process::exit(exitcode::USAGE);
     };
@@ -42,7 +45,10 @@ fn main() -> Result<(), String> {
         run_server(&args.host, args.port)?;
     } else if args.client {
         run_client(&args.host, args.port)?;
-    };
+    } else {
+        println!("To run DH in server or client mode, use -s or -c option");
+        run_cracker()?;
+    }
 
     Ok(())
 }

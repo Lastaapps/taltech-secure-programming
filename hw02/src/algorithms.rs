@@ -56,9 +56,15 @@ fn test_sqruare_and_multiply_mod() {
 pub fn sieve_of_eratosthenes(limit: u64) -> Vec<u64> {
     let mut out = Vec::<u64>::with_capacity((limit as f64 / (limit as f64).ln()) as usize);
 
+    sieve_of_eratosthenes_general(limit, |prime| {out.push(prime); true});
+    out
+}
+
+pub fn sieve_of_eratosthenes_general<F: FnMut(u64) -> bool>(limit: u64, mut on_prime: F) {
+
     let mut data = BitVec::from_elem((limit / 2).try_into().unwrap(), false);
     data.set(0, true); // disable 1
-    out.push(2);
+    on_prime(2);
 
     let fill_limit: u64 = (limit as f64).sqrt() as u64 + 1;
     for i in 0..data.len() {
@@ -67,7 +73,7 @@ pub fn sieve_of_eratosthenes(limit: u64) -> Vec<u64> {
         }
 
         let val = (i * 2 + 1) as u64;
-        out.push(val);
+        if !on_prime(val) {return;};
 
         if val > fill_limit {
             continue;
@@ -77,8 +83,6 @@ pub fn sieve_of_eratosthenes(limit: u64) -> Vec<u64> {
             data.set(j, true);
         }
     }
-
-    out
 }
 
 #[test]
