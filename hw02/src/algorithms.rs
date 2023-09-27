@@ -116,18 +116,19 @@ pub fn random_prime() -> u64 {
 }
 
 pub fn gcd(x: u64, y: u64) -> (u64, (i64, i64)) {
-    let mut r: (u64, u64) = (x, y);
-    let mut s: (i64, i64) = (1, 0);
-    let mut t: (i64, i64) = (0, 1);
+    let mut r: (i128, i128) = (x as i128, y as i128);
+    let mut s: (i128, i128) = (1, 0);
+    let mut t: (i128, i128) = (0, 1);
 
     while r.1 != 0 {
         let q = r.0 / r.1;
         r = (r.1, r.0 - q * r.1);
-        s = (s.1, s.0 - q as i64 * s.1);
-        t = (t.1, t.0 - q as i64 * t.1);
+        s = (s.1, s.0 - q * s.1);
+        t = (t.1, t.0 - q * t.1);
     }
 
-    (r.0, (s.0, t.0))
+    // safe from definition of the algorithm
+    (r.0 as u64, (s.0 as i64, t.0 as i64))
 }
 
 #[test]
@@ -204,6 +205,22 @@ fn test_inverse_mod() {
                 Some(i) => assert_eq!(x * i % m, 1),
                 None => {},
             }
+        }
+    }
+}
+
+pub fn random_undivisible_with(m: u64) -> u64 {
+    if m == 1 {
+        panic!("All the numbers are dividible by 1");
+    }
+    if m == 0 {
+        panic!("We don't do 0 divisions");
+    }
+
+    loop {
+        let num: u64 = rand::thread_rng().gen();
+        if gcd(num, m).0 == 1 {
+            return num;
         }
     }
 }

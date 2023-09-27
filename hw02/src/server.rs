@@ -3,10 +3,8 @@ use std::{
     thread,
 };
 
-use rand::Rng;
-
 use crate::{
-    algorithms::sqruare_and_multiply_mod,
+    algorithms::{sqruare_and_multiply_mod, random_undivisible_with},
     network::{read_message, send_message, DHMessage},
 };
 
@@ -53,8 +51,6 @@ fn handle_server(mut stream: TcpStream, name: &str) -> Result<(), String> {
 }
 
 fn key_excahnge(tcp: &mut TcpStream) -> Result<u64, String> {
-    let mut rng = rand::thread_rng();
-
     let (base, modulo, foreign_key) = match read_message(tcp)? {
         DHMessage::ConnectionProposal {
             base,
@@ -67,7 +63,7 @@ fn key_excahnge(tcp: &mut TcpStream) -> Result<u64, String> {
         DHMessage::Message { data } => todo!("Not ready yet: {}", data.len()),
     };
 
-    let private: u64 = rng.gen(); // TODO check gcd(private, prime - 1) == 1
+    let private: u64 = random_undivisible_with(modulo - 1);
     let public = sqruare_and_multiply_mod(base, private, modulo);
 
     send_message(tcp, DHMessage::ConnectionAck { public })?;

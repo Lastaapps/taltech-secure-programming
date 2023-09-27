@@ -1,8 +1,7 @@
-use rand::Rng;
 use std::net::TcpStream;
 
 use crate::{
-    algorithms::{random_prime, sqruare_and_multiply_mod},
+    algorithms::{random_prime, sqruare_and_multiply_mod, random_undivisible_with},
     network::{read_message, send_message, DHMessage},
 };
 
@@ -26,12 +25,10 @@ pub fn run_client(host: &str, port: u16) -> Result<(), String> {
 }
 
 fn key_excahnge(tcp: &mut TcpStream) -> Result<u64, String> {
-    let mut rng = rand::thread_rng();
-
     let modulo = random_prime();
-    let base: u64 = rng.gen();
+    let base: u64 = random_undivisible_with(modulo);
 
-    let private: u64 = rng.gen(); // TODO check gcd(private, prime - 1) == 1
+    let private: u64 = random_undivisible_with(modulo - 1);
     let public = sqruare_and_multiply_mod(base, private, modulo);
 
     send_message(
