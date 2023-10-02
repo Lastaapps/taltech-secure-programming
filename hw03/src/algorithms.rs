@@ -100,27 +100,27 @@ fn test_sieve_of_eratosthenes() {
 
 pub fn random_prime() -> u64 {
     let mut rng = rand::thread_rng();
-    let prime_no_limit = 2u64.pow(16);
-    let primes = sieve_of_eratosthenes(prime_no_limit);
+    let prime_no_limit = 2u32.pow(16);
+    let primes = sieve_of_eratosthenes(prime_no_limit as u64);
 
     'main: loop {
-        let number: u64 = rng.gen();
+        let number: u32 = rng.gen();
         let number = number | 1;
-        if number < (1 << 32) {
+        if number < (1 << 16) {
             continue;
         }
 
         for prime in primes.iter() {
-            if number % prime == 0 {
+            if number as u64 % prime == 0 {
                 continue 'main;
             }
         }
 
-        if !miller_rabin_test_loop(number, 420) {
+        if !miller_rabin_test_loop(number as u64, 420) {
             continue;
         }
 
-        break number;
+        break number as u64;
     }
 }
 

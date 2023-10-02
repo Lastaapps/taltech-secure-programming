@@ -1,5 +1,7 @@
 use std::io::stdin;
 
+use crate::algorithms::{random_prime, random_undivisible_with, inverse_mod};
+
 mod algorithms;
 
 enum UserIntention {
@@ -54,15 +56,41 @@ fn read_user_intention() -> Result<UserIntention, String> {
 fn main() -> Result<(), String> {
     loop {
         let mode = read_user_intention()?;
-        match mode {
-            UserIntention::GENERATE => todo!(),
+        let res = match mode {
+            UserIntention::GENERATE => generate_keys(),
             UserIntention::CRACK => todo!(),
             UserIntention::ENCRYPT => todo!(),
             UserIntention::DECRYPT => todo!(),
             UserIntention::QUIT => {
                 println!("Ok, bye!");
-                return Ok(())
-            },
-        }
-    } }
+                return Ok(());
+            }
+        };
+
+        if let Err(e) = res {
+            return Err(format!("Operation failed: {}", e));
+        };
+
+    }
+}
+
+fn generate_keys() -> Result<(), String> {
+
+    let p1 = random_prime();
+    let p2 = random_prime();
+    let n = p1 * p2;
+    let m = (p1 - 1) * (p2 - 1);
+    let e = random_undivisible_with(m);
+    let d = inverse_mod(e, m).unwrap();
+
+    println!("p: {}", p1);
+    println!("r: {}", p2);
+    println!("n: {}", n);
+    println!("m: {}", m);
+    println!("e: {}", e);
+    println!("d: {}", d);
+    println!("");
+
+    Ok(())
+}
 
