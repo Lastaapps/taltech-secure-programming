@@ -1,6 +1,6 @@
 use std::io::stdin;
 
-use crate::algorithms::{random_prime, random_undivisible_with, inverse_mod};
+use crate::algorithms::{random_prime, random_undivisible_with, inverse_mod, sieve_of_eratosthenes_general};
 
 mod algorithms;
 
@@ -58,7 +58,7 @@ fn main() -> Result<(), String> {
         let mode = read_user_intention()?;
         let res = match mode {
             UserIntention::GENERATE => generate_keys(),
-            UserIntention::CRACK => todo!(),
+            UserIntention::CRACK => crack(),
             UserIntention::ENCRYPT => todo!(),
             UserIntention::DECRYPT => todo!(),
             UserIntention::QUIT => {
@@ -92,5 +92,54 @@ fn generate_keys() -> Result<(), String> {
     println!("");
 
     Ok(())
+}
+
+fn crack() -> Result<(), String> {
+    println!("Enter modulo n:");
+    let n = read_number()?;
+
+    println!("Enter exponent (public key):");
+    let e = read_number()?;
+
+        println!("Let me think now...");
+
+    let mut res = Ok(());
+    sieve_of_eratosthenes_general(u32::MAX.into(), |prime| {
+        if n % prime == 0 {
+            let other = n / prime;
+
+            println!("Found it, primenumbers are:");
+            println!("{}", prime);
+            println!("{}", other);
+
+            let m = (prime - 1) * (other - 1);
+            let d = inverse_mod(e, m)
+                .ok_or_else(|| format!("Exponent does not have an inverse, wrong input, aborting"));
+
+            match d {
+                Ok(d) => {
+                    println!("Inverse (private key): {}", d);
+                    println!("See you next time, bye!");
+                },
+                Err(e) => {
+                    res = Err(e);
+                },
+            };
+
+            return false;
+        };
+        true
+    });
+
+    res
+}
+
+fn read_number() -> Result<u64, String> {
+    let mut line = String::new();
+    stdin().read_line(&mut line)
+        .map_err(|e| format!("Failed to read input: {}", e))?;
+    let num: u64 = line.trim().parse()
+        .map_err(|e| format!("Failed to parse number: {}", e))?;
+    Ok(num)
 }
 
