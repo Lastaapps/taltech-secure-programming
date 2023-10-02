@@ -1,3 +1,4 @@
+
 use base64::{engine::general_purpose, Engine as _};
 use bit_vec::BitVec;
 use rand::Rng;
@@ -323,6 +324,8 @@ fn prng_cipher_apply(data: &mut [u8], prng: &Random) -> Result<(), String> {
 pub fn rsa_encrypt(msg: &str, key: u64, modulo: u64) -> Result<String, String> {
     let mut data = msg.as_bytes().to_vec();
     padding_add(&mut data)?;
+
+    #[allow(clippy::uninit_vec)]
     let mut out = Vec::with_capacity(data.len() * 2);
     unsafe {
         out.set_len(data.len() * 2);
@@ -352,6 +355,7 @@ pub fn rsa_decrypt(encoded: &str, key: u64, modulo: u64) -> Result<String, Strin
         return Err(format!("Wrong buffer length: {}", data.len()));
     }
 
+    #[allow(clippy::uninit_vec)]
     let mut out = Vec::with_capacity(data.len() / 2);
     unsafe {
         out.set_len(data.len() / 2);
@@ -368,7 +372,7 @@ pub fn rsa_decrypt(encoded: &str, key: u64, modulo: u64) -> Result<String, Strin
             data[i + 5],
             data[i + 6],
             data[i + 7],
-        ]) as u64;
+        ]);
 
         let res = sqruare_and_multiply_mod(num, key, modulo);
         if res >> 32 != 0 {

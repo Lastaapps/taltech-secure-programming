@@ -131,7 +131,7 @@ fn crack() -> Result<(), String> {
 
             let m = (prime - 1) * (other - 1);
             let d = inverse_mod(e, m)
-                .ok_or_else(|| format!("Exponent does not have an inverse, wrong input, aborting"));
+                .ok_or_else(|| "Exponent does not have an inverse, wrong input, aborting".to_string());
 
             match d {
                 Ok(d) => {
@@ -151,7 +151,7 @@ fn crack() -> Result<(), String> {
 }
 
 fn examples() -> Result<(), String> {
-    let biggest_prime = 2_147_483_647 as u64;
+    let biggest_prime = 2_147_483_647_u64;
     println!(
         "Largest 32-bit prime and it's 2nd power: {} {}",
         biggest_prime,
