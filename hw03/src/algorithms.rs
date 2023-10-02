@@ -1,3 +1,4 @@
+use base64::{engine::general_purpose, Engine as _};
 use bit_vec::BitVec;
 use rand::Rng;
 use seeded_random::Random;
@@ -56,12 +57,14 @@ fn test_sqruare_and_multiply_mod() {
 pub fn sieve_of_eratosthenes(limit: u64) -> Vec<u64> {
     let mut out = Vec::<u64>::with_capacity((limit as f64 / (limit as f64).ln()) as usize);
 
-    sieve_of_eratosthenes_general(limit, |prime| {out.push(prime); true});
+    sieve_of_eratosthenes_general(limit, |prime| {
+        out.push(prime);
+        true
+    });
     out
 }
 
 pub fn sieve_of_eratosthenes_general<F: FnMut(u64) -> bool>(limit: u64, mut on_prime: F) {
-
     let mut data = BitVec::from_elem((limit / 2).try_into().unwrap(), false);
     data.set(0, true); // disable 1
     on_prime(2);
@@ -73,7 +76,9 @@ pub fn sieve_of_eratosthenes_general<F: FnMut(u64) -> bool>(limit: u64, mut on_p
         }
 
         let val = (i * 2 + 1) as u64;
-        if !on_prime(val) {return;};
+        if !on_prime(val) {
+            return;
+        };
 
         if val > fill_limit {
             continue;
@@ -176,8 +181,8 @@ pub fn inverse_mod(x: u64, module: u64) -> Option<u64> {
         return None;
     }
 
-    let idk = a % module as i64;
-    let idk = if idk < 0 { idk + module as i64 } else { idk };
+    let idk = (a % module as i64) as i128;
+    let idk = if idk < 0 { idk + module as i128 } else { idk };
 
     Some(idk as u64)
 }
@@ -285,6 +290,7 @@ fn test_miller_rabin_test() {
     assert!(miller_rabin_test(7, 25)); // even though 25 is not a prime
 }
 
+#[allow(dead_code)]
 pub fn prng_cipher_encrypt(msg: &str, prng: &Random) -> Result<Vec<u8>, String> {
     let mut data = msg.as_bytes().to_vec();
     padding_add(&mut data)?;
@@ -292,6 +298,7 @@ pub fn prng_cipher_encrypt(msg: &str, prng: &Random) -> Result<Vec<u8>, String> 
     Ok(data)
 }
 
+#[allow(dead_code)]
 pub fn prng_cipher_decrypt(mut data: Vec<u8>, prng: &Random) -> Result<String, String> {
     padding_remove(&mut data)?;
     prng_cipher_apply(&mut data, prng)?;
@@ -299,6 +306,7 @@ pub fn prng_cipher_decrypt(mut data: Vec<u8>, prng: &Random) -> Result<String, S
     Ok(msg)
 }
 
+#[allow(dead_code)]
 fn prng_cipher_apply(data: &mut [u8], prng: &Random) -> Result<(), String> {
     // if data.len() % 8 != 0 {
     //     return Err("Wrong input buffer length".into());
@@ -312,25 +320,41 @@ fn prng_cipher_apply(data: &mut [u8], prng: &Random) -> Result<(), String> {
     Ok(())
 }
 
-#[allow(dead_code)]
-pub fn exp_cipher_encrypt(msg: &str, key: u64) -> Result<Vec<u8>, String> {
+pub fn rsa_encrypt(msg: &str, key: u64, modulo: u64) -> Result<String, String> {
     let mut data = msg.as_bytes().to_vec();
     padding_add(&mut data)?;
-    exp_cipher_apply(&mut data, key)?;
-    Ok(data)
+    let mut out = Vec::with_capacity(data.len() * 2);
+    unsafe {
+        out.set_len(data.len() * 2);
+    }
+
+    for i in (0..data.len()).step_by(4) {
+        // fuck Rust
+        let num = u32::from_be_bytes([data[i], data[i + 1], data[i + 2], data[i + 3]]) as u64;
+
+        let res = sqruare_and_multiply_mod(num, key, modulo);
+        let res = res.to_be_bytes();
+
+        let i = i * 2;
+        out[i..(i + 8)].copy_from_slice(&res);
+    }
+
+    let encoded = general_purpose::STANDARD_NO_PAD.encode(out);
+    Ok(encoded)
 }
 
-#[allow(dead_code)]
-pub fn exp_cipher_decrypt(mut data: Vec<u8>, key: u64) -> Result<String, String> {
-    padding_remove(&mut data)?;
-    exp_cipher_apply(&mut data, key)?;
-    let msg = String::from_utf8(data).map_err(|e| format!("Failed to decode UTF8 bytes: {}", e))?;
-    Ok(msg)
-}
+pub fn rsa_decrypt(encoded: &str, key: u64, modulo: u64) -> Result<String, String> {
+    let data = general_purpose::STANDARD_NO_PAD
+        .decode(encoded)
+        .map_err(|e| format!("Invalid base64 string: {}", e))?;
 
-fn exp_cipher_apply(data: &mut [u8], key: u64) -> Result<(), String> {
     if data.len() % 8 != 0 {
-        return Err("Wrong input buffer".into());
+        return Err(format!("Wrong buffer length: {}", data.len()));
+    }
+
+    let mut out = Vec::with_capacity(data.len() / 2);
+    unsafe {
+        out.set_len(data.len() / 2);
     }
 
     for i in (0..data.len()).step_by(8) {
@@ -344,15 +368,28 @@ fn exp_cipher_apply(data: &mut [u8], key: u64) -> Result<(), String> {
             data[i + 5],
             data[i + 6],
             data[i + 7],
-        ]);
+        ]) as u64;
 
-        let res = sqruare_and_multiply_mod(num, key, 0);
+        let res = sqruare_and_multiply_mod(num, key, modulo);
+        if res >> 32 != 0 {
+            return Err(format!(
+                "Error while decoding, got to invalid value: {}",
+                res
+            ));
+        }
+
+        let res = res as u32;
         let res = res.to_be_bytes();
 
-        data[i..(i + 8)].copy_from_slice(&res[i..(i + 8)]);
+        let i = i / 2;
+        out[i..(i + 4)].copy_from_slice(&res);
     }
 
-    Ok(())
+    padding_remove(&mut out)?;
+    let msg = String::from_utf8(out)
+        .map_err(|e| format!("Failed to decode UTF8 bytes: {}", e))?;
+
+    Ok(msg)
 }
 
 fn padding_add(data: &mut Vec<u8>) -> Result<(), String> {
@@ -402,18 +439,33 @@ fn test_padding() -> Result<(), String> {
     Ok(())
 }
 
-// #[test]
-#[allow(dead_code)]
-fn test_exp_cipher() -> Result<(), String> {
-    let strings = ["", "a", "aa", "aaa", "aaaa", "aaaaa"];
-    let keys = [37, 59, 1001];
+#[test]
+fn test_rsa() -> Result<(), String> {
+    let strings = [
+        "", "a", "aa", "aaa", "aaaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaa",
+    ];
+    let keys = [
+        // n, e, d
+        (
+            1682336711319573163,
+            11507416482789920999,
+            934179100585940039,
+        ),
+        (1560551115896568457, 620908719484243543, 1293285632883631207),
+        (
+            4839963491556033047,
+            16750320053058506387,
+            1630866064405769963,
+        ),
+    ];
 
-    for key_encrypt in keys {
-        let key_decrypt = inverse_mod(key_encrypt, u64::MAX).unwrap();
-
+    for (n, e, d) in keys {
         for string in strings {
-            let data = exp_cipher_encrypt(string, key_encrypt)?;
-            let res = exp_cipher_decrypt(data, key_decrypt)?;
+            println!("{}", string);
+            let data = rsa_encrypt(string, e, n)?;
+            println!("{}", data);
+            let res = rsa_decrypt(&data, d, n)?;
+            println!("{}", res);
             assert_eq!(string, res);
         }
     }
