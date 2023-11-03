@@ -1,11 +1,10 @@
 use diesel::prelude::*;
-use rocket::http::{Status, Cookie, CookieJar};
+use rocket::http::{Cookie, CookieJar, Status};
 use rocket::outcome::try_outcome;
 use rocket::request::{self, FromRequest, Outcome, Request};
 
 use crate::domain::database::BrutusDb;
-use crate::models::UsersCheckDto;
-use crate::{domain::DomainError, domain::jwt::verify_token};
+use crate::{domain::jwt::verify_token, domain::DomainError};
 
 pub struct Antonius(String); // user
 pub struct Ceasar(String); // admin
@@ -37,7 +36,7 @@ impl<'r> FromRequest<'r> for Antonius {
         };
 
         let db = req.guard::<BrutusDb>().await.unwrap();
-        if db
+        let non_deleted_cnt = db
             .run(|conn| {
                 let local_username = &username;
                 use crate::schema::users::dsl::*;
@@ -45,14 +44,12 @@ impl<'r> FromRequest<'r> for Antonius {
                     .filter(username.eq(local_username))
                     .filter(deleted.eq(false))
                     .limit(1)
-                    .select(UsersCheckDto::as_select())
-                    .first(conn)
-                    .optional()
+                    .count()
+                    .get_result::<i64>(conn)
             })
             .await
-            .unwrap()
-            .is_none()
-        {
+            .unwrap();
+        if non_deleted_cnt != 0 {
             eprintln!("User deleted");
             return Outcome::Failure((
                 Status::Forbidden,
@@ -73,7 +70,7 @@ impl<'r> FromRequest<'r> for Ceasar {
         let username = try_outcome!(req.guard::<Antonius>().await).0;
         let username_copy = username.clone();
 
-        if db
+        let with_admin_role_cnt = db
             .run(|conn| {
                 use crate::schema;
 
@@ -87,9 +84,8 @@ impl<'r> FromRequest<'r> for Ceasar {
                     .get_result::<i64>(conn)
             })
             .await
-            .unwrap()
-            == 0
-        {
+            .unwrap();
+        if with_admin_role_cnt == 0 {
             eprintln!("Invalid admin access attempt");
             return Outcome::Failure((
                 Status::Forbidden,
@@ -108,4 +104,3 @@ pub fn store_jwt_token(cookies: &CookieJar, token: &str) {
 pub fn remove_jwt_token(cookies: &CookieJar) {
     cookies.remove_private(Cookie::named(JWT_COOKIE_KEY))
 }
-

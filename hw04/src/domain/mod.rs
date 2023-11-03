@@ -10,6 +10,7 @@ use rocket::{response::Responder, http::Status};
 pub type Outcome<T> = Result<T, DomainError>;
 
 #[derive(Debug)]
+#[allow(clippy::upper_case_acronyms)]
 pub enum DomainError {
     General(String),
     Diesel(diesel::result::Error),

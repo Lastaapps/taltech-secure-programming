@@ -87,16 +87,16 @@ pub async fn login_post(
         let page = Template::render(
             "login",
             context! {
-                error_msg: "User account is deactivated.",
-            },
-        );
-        return Ok(Either::Left(page));
-    }
+            error_msg: "User account is deactivated.",
+        },
+    );
+    return Ok(Either::Left(page));
+}
 
-    println!("Creating JWT token");
-    let token = create_token(&data.username)?;
-    store_jwt_token(cookies, &token);
+println!("Creating JWT token");
+let token = create_token(&data.username)?;
+store_jwt_token(cookies, &token);
 
-    println!("User logged in");
-    Ok(Either::Right(Redirect::to(uri!("/"))))
+println!("User logged in");
+Ok(Either::Right(Redirect::to(uri!("/"))))
 }

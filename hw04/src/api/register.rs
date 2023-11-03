@@ -1,10 +1,10 @@
 use crate::domain::database::BrutusDb;
-use crate::domain::Outcome;
 use crate::domain::jwt::create_token;
-use crate::models::{CreateUserDto, UsersCheckDto};
-use crate::domain::roles::{Antonius, store_jwt_token};
+use crate::domain::roles::{store_jwt_token, Antonius};
+use crate::domain::Outcome;
+use crate::models::CreateUserDto;
 use crate::util::username_validator;
-use crate::{schema, domain::hashing};
+use crate::{domain::hashing, schema};
 use diesel::prelude::*;
 use either::Either;
 
@@ -40,27 +40,24 @@ pub async fn register_post(
 ) -> Outcome<Either<Template, Redirect>> {
     // already logged in
     if user.is_some() {
-        return Ok(Either::Right(Redirect::to(uri!("/"))))
+        return Ok(Either::Right(Redirect::to(uri!("/"))));
     }
-
 
     println!("Registering new user {}", &data.username);
     let loc_username = data.username.clone();
 
-    if db
-        .run(move |c| {
+    let username_cnt = db
+        .run(move |conn| {
             use crate::schema::users::dsl::*;
 
             users
                 .filter(username.eq(loc_username.as_str()))
                 .limit(1)
-                .select(UsersCheckDto::as_select())
-                .first(c)
-                .optional()
+                .count()
+                .get_result::<i64>(conn)
         })
-        .await?
-        .is_some()
-    {
+        .await?;
+    if username_cnt != 0 {
         let page = Template::render(
             "register",
             context! {
