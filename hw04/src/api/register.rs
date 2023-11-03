@@ -1,6 +1,6 @@
 use crate::domain::database::BrutusDb;
 use crate::domain::jwt::create_token;
-use crate::domain::roles::{store_jwt_token, Antonius};
+use crate::domain::roles::{store_jwt_token, Antonius, KickFromLogin};
 use crate::domain::Outcome;
 use crate::models::CreateUserDto;
 use crate::util::username_validator;
@@ -13,7 +13,7 @@ use rocket::{form::Form, response::Redirect};
 use rocket_dyn_templates::{context, Template};
 
 #[get("/register")]
-pub async fn register_get() -> Template {
+pub async fn register_get(_kick: KickFromLogin) -> Template {
     Template::render(
         "register",
         context! {
@@ -35,13 +35,9 @@ pub struct RegisterForm {
 pub async fn register_post(
     db: BrutusDb,
     cookies: &CookieJar<'_>,
-    user: Option<Antonius>,
+    _kick: KickFromLogin,
     data: Form<RegisterForm>,
 ) -> Outcome<Either<Template, Redirect>> {
-    // already logged in
-    if user.is_some() {
-        return Ok(Either::Right(Redirect::to(uri!("/"))));
-    }
 
     println!("Registering new user {}", &data.username);
     let loc_username = data.username.clone();

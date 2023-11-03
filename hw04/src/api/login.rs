@@ -1,18 +1,18 @@
-use crate::domain::jwt::create_token;
-use crate::domain::roles::store_jwt_token;
-use crate::domain::{database::BrutusDb, roles::Antonius};
-use crate::domain::Outcome;
-use crate::models::LoginUserDto;
 use crate::domain::hashing;
+use crate::domain::jwt::create_token;
+use crate::domain::roles::{store_jwt_token, KickFromLogin};
+use crate::domain::Outcome;
+use crate::domain::{database::BrutusDb, roles::Antonius};
+use crate::models::LoginUserDto;
 use crate::util::username_validator;
 use diesel::prelude::*;
 use either::Either;
 
-use rocket::{form::Form, response::Redirect, http::CookieJar};
+use rocket::{form::Form, http::CookieJar, response::Redirect};
 use rocket_dyn_templates::{context, Template};
 
 #[get("/login")]
-pub async fn login_get() -> Template {
+pub async fn login_get(_kick: KickFromLogin) -> Template {
     Template::render(
         "login",
         context! {
@@ -34,14 +34,9 @@ pub struct LoginForm {
 pub async fn login_post(
     db: BrutusDb,
     cookies: &CookieJar<'_>,
-    user: Option<Antonius>,
+    _kick: KickFromLogin,
     data: Form<LoginForm>,
 ) -> Outcome<Either<Template, Redirect>> {
-    // already logged in
-    if user.is_some() {
-        return Ok(Either::Right(Redirect::to(uri!("/"))));
-    }
-
     println!("Login user {}", &data.username);
     let username_copy = data.username.clone();
     let err_msg = "Username does not exist or the password is incorrect.";
@@ -87,16 +82,16 @@ pub async fn login_post(
         let page = Template::render(
             "login",
             context! {
-            error_msg: "User account is deactivated.",
-        },
-    );
-    return Ok(Either::Left(page));
-}
+                error_msg: "User account is deactivated.",
+            },
+        );
+        return Ok(Either::Left(page));
+    }
 
-println!("Creating JWT token");
-let token = create_token(&data.username)?;
-store_jwt_token(cookies, &token);
+    println!("Creating JWT token");
+    let token = create_token(&data.username)?;
+    store_jwt_token(cookies, &token);
 
-println!("User logged in");
-Ok(Either::Right(Redirect::to(uri!("/"))))
+    println!("User logged in");
+    Ok(Either::Right(Redirect::to(uri!("/"))))
 }

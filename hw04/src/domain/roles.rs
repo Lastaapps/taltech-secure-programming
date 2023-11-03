@@ -8,6 +8,7 @@ use crate::{domain::jwt::verify_token, domain::DomainError};
 
 pub struct Antonius(String); // user
 pub struct Ceasar(String); // admin
+pub struct KickFromLogin();
 
 static JWT_COOKIE_KEY: &str = "jwt";
 
@@ -97,10 +98,28 @@ impl<'r> FromRequest<'r> for Ceasar {
     }
 }
 
+#[rocket::async_trait]
+impl<'r> FromRequest<'r> for KickFromLogin {
+    type Error = DomainError;
+
+    async fn from_request(req: &'r Request<'_>) -> request::Outcome<Self, Self::Error> {
+        let cookies = req.guard::<&CookieJar>().await.unwrap();
+        if has_jwt_token(cookies) {
+            Outcome::Failure((Status::PreconditionFailed, DomainError::General("Already logged in".into())))
+        } else {
+            Outcome::Success(KickFromLogin())
+        }
+    }
+}
+
 pub fn store_jwt_token(cookies: &CookieJar, token: &str) {
     cookies.add_private(Cookie::new(JWT_COOKIE_KEY.to_string(), token.to_string()))
 }
 
 pub fn remove_jwt_token(cookies: &CookieJar) {
     cookies.remove_private(Cookie::named(JWT_COOKIE_KEY))
+}
+
+pub fn has_jwt_token(cookies: &CookieJar) -> bool {
+    cookies.get_private(JWT_COOKIE_KEY).is_some()
 }
