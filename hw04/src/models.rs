@@ -4,7 +4,7 @@ use diesel::prelude::*;
 #[diesel(table_name = crate::schema::users)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct UsersCheckDto {
-    username: String,
+    pub username: String,
 }
 
 #[derive(Insertable)]

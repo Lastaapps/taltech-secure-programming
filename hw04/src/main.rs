@@ -8,6 +8,7 @@ mod models;
 mod register;
 mod schema;
 mod security;
+mod util;
 
 use crate::database::BrutusDb;
 

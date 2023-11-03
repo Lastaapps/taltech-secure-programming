@@ -4,6 +4,7 @@ use crate::models::{CreateUserDto, UsersCheckDto};
 use crate::{schema, security};
 use diesel::prelude::*;
 use either::Either;
+use crate::util::username_validator;
 use rocket::response::Responder;
 use rocket::Response;
 use rocket::{
@@ -26,6 +27,7 @@ pub async fn register_get() -> Template {
 #[derive(FromForm)]
 pub struct RegisterForm {
     #[field(validate = len(1..))]
+    #[field(validate = username_validator())]
     username: String,
     #[field(validate = len(8..))]
     password: String,
@@ -38,6 +40,7 @@ pub async fn register_post(
 ) -> Outcome<Either<Template, Redirect>> {
     use crate::schema::users::dsl::*;
 
+    println!("Registering new user {}", &data.username);
     let loc_username = data.username.clone();
 
     if let Some(_) = db
@@ -46,7 +49,7 @@ pub async fn register_post(
                 .filter(username.eq(loc_username.as_str()))
                 .limit(1)
                 .select(UsersCheckDto::as_select())
-                .load(c)
+                .first(c)
                 .optional()
         })
         .await?
@@ -60,6 +63,7 @@ pub async fn register_post(
         return Ok(Either::Left(page));
     }
 
+    println!("Hashing password");
     let hashed = security::hash_password(&data.password)?;
 
     let obj = CreateUserDto {
@@ -68,6 +72,7 @@ pub async fn register_post(
     };
 
     // There is a race condition with the username, TODO resolve better
+    println!("Storing to db");
     db.run(|c| {
         diesel::insert_into(schema::users::table)
             .values(obj)
@@ -75,5 +80,6 @@ pub async fn register_post(
     })
     .await?;
 
+    println!("User created");
     Ok(Either::Right(Redirect::temporary(uri!("/login"))))
 }

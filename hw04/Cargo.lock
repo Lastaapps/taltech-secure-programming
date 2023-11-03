@@ -216,6 +216,7 @@ dependencies = [
  "either",
  "password-hash",
  "rand",
+ "regex",
  "rocket",
  "rocket_dyn_templates",
  "rocket_sync_db_pools",

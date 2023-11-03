@@ -1,4 +1,7 @@
 CREATE TABLE roles(
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     name TEXT NOT NULL UNIQUE
-)
+);
+
+INSERT INTO roles(name) VALUES ('admin');
+

@@ -7,11 +7,11 @@
     <h1>Register</h1>
 
     <label for="username">Username</label>
-    <input type="text" name="username" id="username" minlength="1" maxlength="20" pattern="[0-9a-z]+" required>
+    <input type="text" name="username" id="username" minlength="1" maxlength="20" pattern="[0-9a-zA-Z]+" required>
     <br>
 
     <label for="password">Password</label>
-    <input type="password" name="password" id="password" required>
+    <input type="password" name="password" id="password" minlength="8" required>
     <br>
 
     <p>{{ error_msg }}</p>
