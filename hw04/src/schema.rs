@@ -2,7 +2,7 @@
 
 diesel::table! {
     ceasar (id) {
-        id -> Nullable<Integer>,
+        id -> Integer,
         shift -> Integer,
         data -> Text,
         deleted -> Integer,
@@ -13,14 +13,14 @@ diesel::table! {
 
 diesel::table! {
     roles (id) {
-        id -> Nullable<Integer>,
+        id -> Integer,
         name -> Text,
     }
 }
 
 diesel::table! {
     roles_users (id) {
-        id -> Nullable<Integer>,
+        id -> Integer,
         user_id -> Integer,
         role_id -> Integer,
     }
@@ -28,10 +28,9 @@ diesel::table! {
 
 diesel::table! {
     users (id) {
-        id -> Nullable<Integer>,
+        id -> Integer,
         username -> Text,
         password_hash -> Text,
-        salt -> Text,
         deleted -> Integer,
         created_at -> Timestamp,
         updated_at -> Timestamp,
@@ -40,7 +39,7 @@ diesel::table! {
 
 diesel::table! {
     vigenere (id) {
-        id -> Nullable<Integer>,
+        id -> Integer,
         key -> Text,
         data -> Text,
         deleted -> Integer,
