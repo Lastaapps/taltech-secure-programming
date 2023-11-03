@@ -1,3 +1,9 @@
+
+pub mod database;
+pub mod jwt;
+pub mod roles;
+pub mod hashing;
+
 use rocket::{response::Responder, http::Status};
 
 

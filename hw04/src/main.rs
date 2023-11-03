@@ -1,43 +1,24 @@
 use dotenv::dotenv;
-use rocket::{fairing::AdHoc, Request};
-use rocket_dyn_templates::{context, Template};
+use rocket::fairing::AdHoc;
+use rocket_dyn_templates::Template;
 
-mod database;
+mod api;
 mod domain;
-mod jwt;
-mod login;
-mod logout;
+
 mod models;
-mod register;
-mod roles;
 mod schema;
-mod security;
 mod util;
 
 
 #[macro_use]
 extern crate lazy_static;
 
-use crate::database::BrutusDb;
+use crate::domain::database::BrutusDb;
+use crate::api::FuckRustApi;
 
 #[macro_use]
 extern crate rocket;
 extern crate diesel_migrations;
-
-#[get("/")]
-fn index() -> Template {
-    Template::render("index", context! {})
-}
-
-#[catch(404)]
-pub fn not_found(req: &Request<'_>) -> Template {
-    Template::render(
-        "error/404",
-        context! {
-            uri: req.uri()
-        },
-    )
-}
 
 #[launch]
 fn rocket() -> _ {
@@ -46,34 +27,12 @@ fn rocket() -> _ {
     // fix diesel rebuilding
     println!("cargo:rerun-if-changed=migrations");
 
-    rocket::build()
-        .mount("/", routes![index,])
-        .mount(
-            "/",
-            routes![
-                crate::register::register_get,
-                crate::register::register_post,
-            ],
-        )
-        .mount(
-            "/",
-            routes![
-                crate::login::login_get,
-                crate::login::login_post,
-            ],
-        )
-        .mount(
-            "/",
-            routes![
-                crate::logout::logout_get,
-                crate::logout::logout_post,
-            ],
-        )
-        .register("/", catchers![not_found])
+    FuckRustApi::from(rocket::build())
+        .mount_api()
         .attach(Template::fairing())
         .attach(BrutusDb::fairing())
         .attach(AdHoc::try_on_ignite(
             "Database Migrations",
-            database::migrate,
+            domain::database::migrate,
         ))
 }

@@ -1,9 +1,9 @@
-use crate::jwt::create_token;
-use crate::roles::store_jwt_token;
-use crate::{database::BrutusDb, roles::Antonius};
+use crate::domain::jwt::create_token;
+use crate::domain::roles::store_jwt_token;
+use crate::domain::{database::BrutusDb, roles::Antonius};
 use crate::domain::Outcome;
 use crate::models::LoginUserDto;
-use crate::security;
+use crate::domain::hashing;
 use crate::util::username_validator;
 use diesel::prelude::*;
 use either::Either;
@@ -72,7 +72,7 @@ pub async fn login_post(
     };
 
     println!("Checking password");
-    if !security::verify_password(&data.password, &user.password_hash)? {
+    if !hashing::verify_password(&data.password, &user.password_hash)? {
         let page = Template::render(
             "login",
             context! {

@@ -1,10 +1,10 @@
-use crate::database::BrutusDb;
+use crate::domain::database::BrutusDb;
 use crate::domain::Outcome;
-use crate::jwt::create_token;
+use crate::domain::jwt::create_token;
 use crate::models::{CreateUserDto, UsersCheckDto};
-use crate::roles::{Antonius, store_jwt_token};
+use crate::domain::roles::{Antonius, store_jwt_token};
 use crate::util::username_validator;
-use crate::{schema, security};
+use crate::{schema, domain::hashing};
 use diesel::prelude::*;
 use either::Either;
 
@@ -71,7 +71,7 @@ pub async fn register_post(
     }
 
     println!("Hashing password");
-    let hashed = security::hash_password(&data.password)?;
+    let hashed = hashing::hash_password(&data.password)?;
 
     let obj = CreateUserDto {
         username: data.username.clone(),

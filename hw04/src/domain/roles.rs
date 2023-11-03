@@ -3,9 +3,9 @@ use rocket::http::{Status, Cookie, CookieJar};
 use rocket::outcome::try_outcome;
 use rocket::request::{self, FromRequest, Outcome, Request};
 
-use crate::database::BrutusDb;
+use crate::domain::database::BrutusDb;
 use crate::models::UsersCheckDto;
-use crate::{domain::DomainError, jwt::verify_token};
+use crate::{domain::DomainError, domain::jwt::verify_token};
 
 pub struct Antonius(String); // user
 pub struct Ceasar(String); // admin

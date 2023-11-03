@@ -1,7 +1,7 @@
 use rocket::{http::CookieJar, response::Redirect};
 use rocket_dyn_templates::{Template, context};
 
-use crate::roles::remove_jwt_token;
+use crate::domain::roles::remove_jwt_token;
 
 #[get("/logout")]
 pub async fn logout_get() -> Template {
