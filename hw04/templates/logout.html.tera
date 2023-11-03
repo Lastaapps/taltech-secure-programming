@@ -1,0 +1,20 @@
+{% extends "base" %}
+
+{% block content %}
+
+<form action="/logout" enctype="multipart/form-data" method="post">
+
+    <h1>Logout</h1>
+
+    <p>Are you sure?</p>
+
+    <p>{{ error_msg }}</p>
+    <br>
+
+    <input type="submit" value="Logout!">
+
+    <a href="/">Home</a>
+</form>
+
+{% endblock content %}
+

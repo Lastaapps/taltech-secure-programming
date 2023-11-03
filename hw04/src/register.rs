@@ -1,11 +1,14 @@
 use crate::database::BrutusDb;
 use crate::domain::Outcome;
+use crate::jwt::create_token;
 use crate::models::{CreateUserDto, UsersCheckDto};
+use crate::roles::{Antonius, store_jwt_token};
 use crate::util::username_validator;
 use crate::{schema, security};
 use diesel::prelude::*;
 use either::Either;
 
+use rocket::http::CookieJar;
 use rocket::{form::Form, response::Redirect};
 use rocket_dyn_templates::{context, Template};
 
@@ -31,15 +34,23 @@ pub struct RegisterForm {
 #[post("/register", data = "<data>")]
 pub async fn register_post(
     db: BrutusDb,
+    cookies: &CookieJar<'_>,
+    user: Option<Antonius>,
     data: Form<RegisterForm>,
 ) -> Outcome<Either<Template, Redirect>> {
-    use crate::schema::users::dsl::*;
+    // already logged in
+    if user.is_some() {
+        return Ok(Either::Right(Redirect::to(uri!("/"))))
+    }
+
 
     println!("Registering new user {}", &data.username);
     let loc_username = data.username.clone();
 
     if db
         .run(move |c| {
+            use crate::schema::users::dsl::*;
+
             users
                 .filter(username.eq(loc_username.as_str()))
                 .limit(1)
@@ -66,6 +77,7 @@ pub async fn register_post(
         username: data.username.clone(),
         password_hash: hashed,
     };
+    let username = obj.username.clone();
 
     // There is a race condition with the username, TODO resolve better
     println!("Storing to db");
@@ -76,6 +88,11 @@ pub async fn register_post(
     })
     .await?;
 
+    println!("Creating JWT token");
+    let token = create_token(&username)?;
+    store_jwt_token(cookies, &token);
+
     println!("User created");
-    Ok(Either::Right(Redirect::to(uri!("/login"))))
+
+    Ok(Either::Right(Redirect::to(uri!("/"))))
 }

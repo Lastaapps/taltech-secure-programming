@@ -4,12 +4,19 @@ use rocket_dyn_templates::{context, Template};
 
 mod database;
 mod domain;
+mod jwt;
 mod login;
+mod logout;
 mod models;
 mod register;
+mod roles;
 mod schema;
 mod security;
 mod util;
+
+
+#[macro_use]
+extern crate lazy_static;
 
 use crate::database::BrutusDb;
 
@@ -53,6 +60,13 @@ fn rocket() -> _ {
             routes![
                 crate::login::login_get,
                 crate::login::login_post,
+            ],
+        )
+        .mount(
+            "/",
+            routes![
+                crate::logout::logout_get,
+                crate::logout::logout_post,
             ],
         )
         .register("/", catchers![not_found])

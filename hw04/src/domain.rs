@@ -5,8 +5,10 @@ pub type Outcome<T> = Result<T, DomainError>;
 
 #[derive(Debug)]
 pub enum DomainError {
+    General(String),
     Diesel(diesel::result::Error),
     Argon2(argon2::password_hash::Error),
+    JWT(jsonwebtoken::errors::Error),
 }
 
 impl From<diesel::result::Error> for DomainError {
@@ -21,9 +23,19 @@ impl From<argon2::password_hash::Error> for DomainError {
     }
 }
 
+impl From<jsonwebtoken::errors::Error> for DomainError {
+    fn from(value: jsonwebtoken::errors::Error) -> Self {
+        DomainError::JWT(value)
+    }
+}
+
 impl<'r, 'o: 'r> Responder<'r, 'o> for DomainError {
     fn respond_to(self, _request: &'r rocket::Request<'_>) -> rocket::response::Result<'o> {
         match self {
+            DomainError::General(e) => {
+                eprint!("{}", e);
+                Err(Status::InternalServerError)
+            },
             DomainError::Diesel(e) => {
                 eprint!("{}", e);
                 Err(Status::InternalServerError)
@@ -31,6 +43,10 @@ impl<'r, 'o: 'r> Responder<'r, 'o> for DomainError {
             DomainError::Argon2(e) => {
                 eprint!("{}", e);
                 Err(Status::InternalServerError)
+            },
+            DomainError::JWT(e) => {
+                eprint!("{}", e);
+                Err(Status::Unauthorized)
             },
         }
     }

@@ -1,12 +1,14 @@
-use crate::database::BrutusDb;
+use crate::jwt::create_token;
+use crate::roles::store_jwt_token;
+use crate::{database::BrutusDb, roles::Antonius};
 use crate::domain::Outcome;
 use crate::models::LoginUserDto;
-use crate::util::username_validator;
 use crate::security;
+use crate::util::username_validator;
 use diesel::prelude::*;
 use either::Either;
 
-use rocket::{form::Form, response::Redirect};
+use rocket::{form::Form, response::Redirect, http::CookieJar};
 use rocket_dyn_templates::{context, Template};
 
 #[get("/login")]
@@ -31,18 +33,25 @@ pub struct LoginForm {
 #[post("/login", data = "<data>")]
 pub async fn login_post(
     db: BrutusDb,
+    cookies: &CookieJar<'_>,
+    user: Option<Antonius>,
     data: Form<LoginForm>,
 ) -> Outcome<Either<Template, Redirect>> {
-    use crate::schema::users::dsl::*;
+    // already logged in
+    if user.is_some() {
+        return Ok(Either::Right(Redirect::to(uri!("/"))));
+    }
 
     println!("Login user {}", &data.username);
-    let loc_username = data.username.clone();
+    let username_copy = data.username.clone();
     let err_msg = "Username does not exist or the password is incorrect.";
 
     let user = match db
         .run(move |c| {
+            use crate::schema::users::dsl::*;
+
             users
-                .filter(username.eq(loc_username.as_str()))
+                .filter(username.eq(username_copy.as_str()))
                 .limit(1)
                 .select(LoginUserDto::as_select())
                 .first(c)
@@ -85,7 +94,8 @@ pub async fn login_post(
     }
 
     println!("Creating JWT token");
-    // TODO JTW token
+    let token = create_token(&data.username)?;
+    store_jwt_token(cookies, &token);
 
     println!("User logged in");
     Ok(Either::Right(Redirect::to(uri!("/"))))
