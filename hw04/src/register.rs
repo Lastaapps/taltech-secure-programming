@@ -1,17 +1,12 @@
 use crate::database::BrutusDb;
-use crate::domain::{DomainError, Outcome};
+use crate::domain::Outcome;
 use crate::models::{CreateUserDto, UsersCheckDto};
+use crate::util::username_validator;
 use crate::{schema, security};
 use diesel::prelude::*;
 use either::Either;
-use crate::util::username_validator;
-use rocket::response::Responder;
-use rocket::Response;
-use rocket::{
-    form::{validate::len, Form, Strict},
-    futures::stream::Select,
-    response::{Debug, Redirect},
-};
+
+use rocket::{form::Form, response::Redirect};
 use rocket_dyn_templates::{context, Template};
 
 #[get("/register")]
@@ -43,7 +38,7 @@ pub async fn register_post(
     println!("Registering new user {}", &data.username);
     let loc_username = data.username.clone();
 
-    if let Some(_) = db
+    if db
         .run(move |c| {
             users
                 .filter(username.eq(loc_username.as_str()))
@@ -53,6 +48,7 @@ pub async fn register_post(
                 .optional()
         })
         .await?
+        .is_some()
     {
         let page = Template::render(
             "register",

@@ -26,11 +26,11 @@ impl<'r, 'o: 'r> Responder<'r, 'o> for DomainError {
         match self {
             DomainError::Diesel(e) => {
                 eprint!("{}", e);
-                return Err(Status::InternalServerError)
+                Err(Status::InternalServerError)
             },
             DomainError::Argon2(e) => {
                 eprint!("{}", e);
-                return Err(Status::InternalServerError)
+                Err(Status::InternalServerError)
             },
         }
     }

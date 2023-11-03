@@ -23,7 +23,7 @@ pub fn verify_password(password: &str, password_hash: &str) -> Result<bool, Erro
     //
     // NOTE: hash params from `parsed_hash` are used instead of what is configured in the
     // `Argon2` instance.
-    let parsed_hash = PasswordHash::new(&password_hash)?;
+    let parsed_hash = PasswordHash::new(password_hash)?;
     let valid = Argon2::default()
         .verify_password(password.as_bytes(), &parsed_hash)
         .is_ok();
