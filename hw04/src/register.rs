@@ -77,5 +77,5 @@ pub async fn register_post(
     .await?;
 
     println!("User created");
-    Ok(Either::Right(Redirect::temporary(uri!("/login"))))
+    Ok(Either::Right(Redirect::to(uri!("/login"))))
 }

@@ -15,6 +15,9 @@ diesel::table! {
     roles (id) {
         id -> Integer,
         name -> Text,
+        deleted -> Bool,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
     }
 }
 
@@ -23,6 +26,8 @@ diesel::table! {
         id -> Integer,
         user_id -> Integer,
         role_id -> Integer,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
     }
 }
 
@@ -31,7 +36,7 @@ diesel::table! {
         id -> Integer,
         username -> Text,
         password_hash -> Text,
-        deleted -> Integer,
+        deleted -> Bool,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
