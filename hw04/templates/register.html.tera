@@ -6,16 +6,15 @@
 
     <h1>Register</h1>
 
-    <label for="username">Username</label>
-    <input type="text" name="username" id="username" minlength="1" maxlength="20" pattern="[0-9a-zA-Z]+" required>
-    <br>
+    <label for="username">Username</label><br>
+    <input type="text" name="username" id="username" minlength="1" maxlength="20" pattern="[0-9a-zA-Z]+" required><br>
 
-    <label for="password">Password</label>
-    <input type="password" name="password" id="password" minlength="8" required>
-    <br>
+    <label for="password">Password</label><br>
+    <input type="password" name="password" id="password" minlength="8" required><br>
 
-    <p>{{ error_msg }}</p>
-    <br>
+    {% if error_msg %}
+    <p>{{ error_msg }}</p><br>
+    {% endif %}
 
     <input type="submit" value="Register">
 

@@ -2,6 +2,119 @@
 
 {% block content %}
 
-<h1>Hello world</h1>
+<h1>Brutus - totally secure cipher storage</h1>
+
+<p>Logged in as: {{ username }}, <a href="/logout">Logout</a></p>
+
+{% if admin %}
+<a href="/admin/recovery">Cipher recovery</a>
+{% else %}
+<i>
+Notice: In case you delete a cipher, watch this 
+<a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank">manual</a>
+and ask admin for cipher recovery.
+Admin can see only encrypted text, your secrets cannot be decrypted.
+</i>
+{% endif %}
+
+<h2>Ceasar ciphers</h2>
+
+<h4>Encypt and store new cipher:</h4>
+
+<table width="100%">
+   <tr>
+      <td>
+         <form action="/add-ceasar" target="msg_ceasar_plain" enctype="multipart/form-data" method="post">
+            <input type="hidden" name="format" value="plain"/>
+            <table border-spacing="8px">
+               <tr>
+                  <td><label for="plain">Plain text:</label></td>
+                  <td><input type="text" name="plain" id="plain"/><br></td>
+               </tr>
+               <tr>
+                  <td><label for="shift">Shift:</label></td>
+                  <td><input type="number" name="shift" id="shift" value="42" /><br></td>
+               </tr>
+               <tr>
+                  <td></td>
+                  <td><input type="submit" value="Encrypt and store"/></td>
+               </tr>
+            </table>
+         </form>
+      </td>
+      <td>
+         <form action="/add-ceasar" target="msg_ceasar_base64" enctype="multipart/form-data" method="post">
+            <input type="hidden" name="format" value="base64"/>
+            <table border-spacing="8px">
+               <tr>
+                  <td><label for="plain">Base64 (standard):</label></td>
+                  <td><input type="text" name="plain" id="plain" pattern="^[-A-Za-z0-9+/]*={0,3}$"/><br></td>
+               </tr>
+               <tr>
+                  <td><label for="shift">Shift:</label></td>
+                  <td><input type="number" name="shift" id="shift" value="42" /><br></td>
+               </tr>
+               <tr>
+                  <td></td>
+                  <td><input type="submit" value="Encrypt and store"/></td>
+               </tr>
+            </table>
+         </form>
+      </td>
+   </tr>
+   <tr>
+      <td>
+         <iframe name='msg_ceasar_plain' height="24em" width="100%" frameborder="0" scrolling="no" ></iframe>
+      </td>
+      <td>
+         <iframe name='msg_ceasar_base64' height="24em" width="100%" frameborder="0" scrolling="no"></iframe>
+      </td>
+   </tr>
+</table>
+<br>
+
+<h4>Stored ciphers:</h4>
+
+{% if ceasar_list | length == 0 %}
+No ciphers yet
+{% else %}
+
+<table width="100%" border="1px solid black">
+   <tr>
+      <th>Encrypted (base64)</th>
+      <th>Key</th>
+      <th>Decrypt to</th>
+      <th>Decrypted</th>
+      <th></th>
+   </tr>
+   {% for cipher in ceasar_list %}
+   <tr>
+      <td>{{ cipher.base64 }}</td>
+      <td>{{ cipher.shift }}</td>
+      <td>
+         <form action="/decrypt-ceasar" target="decrypt_frame" enctype="multipart/form-data" method="post" style="display:inline-block;">
+            <input type="hidden" name="id" value="{{ cipher.id }}"/>
+            <input type="hidden" name="format" value="plain"/>
+            <input type="submit" value="Plain text"/>
+         </form>
+         <form action="/decrypt-ceasar" target="decrypt_frame" enctype="multipart/form-data" method="post" style="display:inline-block;">
+            <input type="hidden" name="id" value="{{ cipher.id }}"/>
+            <input type="hidden" name="format" value="base64"/>
+            <input type="submit" value="Base64"/>
+         </form>
+      </td>
+      <td>
+         <iframe name='decrypt_frame' height="24em" width="100%" frameborder="0" scrolling="no" ></iframe>
+      </td>
+      <td>
+         <form action="/delete-ceasar" enctype="multipart/form-data" method="post">
+            <input type="hidden" name="id" value="{{ cipher.id }}"/>
+            <input type="submit" value="Delete"/>
+         </form>
+      </td>
+   </tr>
+   {% endfor %}
+</table>
+{% endif %}
 
 {% endblock content %}

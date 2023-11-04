@@ -6,8 +6,8 @@ use rocket::request::{self, FromRequest, Outcome, Request};
 use crate::domain::database::BrutusDb;
 use crate::{domain::jwt::verify_token, domain::DomainError};
 
-pub struct Antonius(String); // user
-pub struct Ceasar(String); // admin
+pub struct Antonius(pub String); // user
+pub struct Ceasar(pub String); // admin
 pub struct KickFromLogin();
 
 static JWT_COOKIE_KEY: &str = "jwt";

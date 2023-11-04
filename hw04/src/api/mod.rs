@@ -1,3 +1,6 @@
+
+pub mod decrypt;
+pub mod index;
 pub mod login;
 pub mod logout;
 pub mod register;
@@ -15,11 +18,6 @@ fn not_found(req: &Request<'_>) -> Template {
     )
 }
 
-#[get("/")]
-fn index() -> Template {
-    Template::render("index", context! {})
-}
-
 pub struct FuckRustApi(Rocket<Build>);
 impl FuckRustApi {
     pub fn mount_api(self) -> Rocket<Build> {
@@ -27,7 +25,6 @@ impl FuckRustApi {
             .mount(
                 "/",
                 routes![
-                    index,
                     // register
                     crate::api::register::register_get,
                     crate::api::register::register_post,
@@ -37,6 +34,10 @@ impl FuckRustApi {
                     // logout
                     crate::api::logout::logout_get,
                     crate::api::logout::logout_post,
+                    // index
+                    crate::api::index::index_get,
+                    // decrypt
+                    crate::api::decrypt::decrypt_ceasar_post,
                 ],
             )
             .register("/", catchers![not_found])

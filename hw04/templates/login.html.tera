@@ -5,15 +5,16 @@
 <h1>Login</h1>
 
 <form action="/login" enctype="multipart/form-data" method="post">
-    <label for="username">Username</label>
-    <input type="text" name="username" id="username" minlength="1" maxlength="20" pattern="[0-9a-z]+" required>
-    <br>
+    <label for="username">Username</label><br>
+    <input type="text" name="username" id="username" minlength="1" maxlength="20" pattern="[0-9a-zA-Z]+" required><br>
 
-    <label for="password">Password</label>
-    <input type="password" name="password" id="password" required>
-    <br>
+    <label for="password">Password</label><br>
+    <input type="password" name="password" id="password" minlength="8" required><br>
 
-    <p>{{ error_msg }}</p>
+    {% if error_msg %}
+    <p>{{ error_msg }}</p><br>
+    {% endif %}
+
     <br>
 
     <input type="submit" value="Login">
@@ -22,5 +23,3 @@
 </form>
 
 {% endblock content %}
-
-<!-- vim: set ft=html: -->
