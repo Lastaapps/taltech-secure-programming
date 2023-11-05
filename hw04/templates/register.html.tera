@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<form action="/register" enctype="multipart/form-data" method="post">
+<form enctype="multipart/form-data" method="post">
 
     <h1>Register</h1>
 

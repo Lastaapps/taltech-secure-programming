@@ -21,6 +21,7 @@ pub struct Claims {
 static ISSUER: &str = "Brutus";
 static AUDIENCE_WEB: &str = "web";
 static AUNDIENCES: [&str; 1] = [AUDIENCE_WEB];
+static TOKEN_VALID_MINS: u64 = 10;
 
 lazy_static! {
     static ref HMAC_KEY: String = env::var("JWT_HMAC_KEY").unwrap();
@@ -31,12 +32,10 @@ lazy_static! {
 pub fn create_token(username: &str) -> Result<String, DomainError> {
     let claims = Claims::new(username);
     let token = encode(&Header::default(), &claims, &HMAC_KEY_ENCODE)?;
-    println!("Created token:  {}", token);
     Ok(token)
 }
 
 pub fn verify_token(token: &str) -> Result<String, DomainError> {
-    println!("Checking token: {}", token);
     let mut validation = Validation::new(Algorithm::HS256);
     validation.set_audience(&AUNDIENCES);
     validation.set_issuer(&[ISSUER]);
@@ -54,7 +53,7 @@ impl Claims {
             .unwrap();
         let iat = now.as_secs();
         let exp = now
-            .checked_add(Duration::new(60 * 10, 0))
+            .checked_add(Duration::new(60 * TOKEN_VALID_MINS, 0))
             .unwrap()
             .as_secs();
 

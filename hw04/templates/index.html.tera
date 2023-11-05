@@ -7,7 +7,7 @@
 <p>Logged in as: {{ username }}, <a href="/logout">Logout</a></p>
 
 {% if admin %}
-<a href="/recover-cipher">Cipher recovery</a>
+<a href="/admin/recover-cipher">Cipher recovery</a>
 {% else %}
 <i>
 Notice: In case you delete a cipher, watch this 
@@ -29,11 +29,11 @@ Admin can see only encrypted text, your secrets cannot be decrypted.
             <table border-spacing="8px">
                <tr>
                   <td><label for="data">Plain text:</label></td>
-                  <td><input type="text" name="data" id="data" maxlength="1024"/><br></td>
+                  <td class="base64"><input type="text" name="data" id="data" maxlength="1024"/><br></td>
                </tr>
                <tr>
                   <td><label for="shift">Shift:</label></td>
-                  <td><input type="number" name="shift" id="shift" value="42" /><br></td>
+                  <td class="base64"><input type="number" name="shift" id="shift" value="42" /><br></td>
                </tr>
                <tr>
                   <td></td>
@@ -47,11 +47,11 @@ Admin can see only encrypted text, your secrets cannot be decrypted.
             <input type="hidden" name="is_base" value="true"/>
             <table border-spacing="8px">
                <tr>
-                  <td><label for="data">Base64 (standard):</label></td>
+                  <td class="base64"><label for="data">Base64 (standard):</label></td>
                   <td><input type="text" name="data" id="data" pattern="^[-A-Za-z0-9+/]*={0,3}$" maxlength="1024"/><br></td>
                </tr>
                <tr>
-                  <td><label for="shift">Shift:</label></td>
+                  <td class="base64"><label for="shift">Shift:</label></td>
                   <td><input type="number" name="shift" id="shift" value="42" /><br></td>
                </tr>
                <tr>
@@ -79,7 +79,7 @@ Admin can see only encrypted text, your secrets cannot be decrypted.
 No ciphers yet
 {% else %}
 
-<table width="100%" border="1px solid black">
+<table class="ciphers-table" border="1px solid black">
    <tr>
       <th>Encrypted (base64)</th>
       <th>Key</th>
@@ -89,8 +89,8 @@ No ciphers yet
    </tr>
    {% for cipher in ceasar_list %}
    <tr>
-      <td>{{ cipher.base64 }}</td>
-      <td>{{ cipher.shift }}</td>
+      <td class="base64"><div>{{ cipher.base64 }}</div></td>
+      <td class="base64"><div>{{ cipher.shift }}</div></td>
       <td>
          <form action="/decrypt-cipher" target="decrypt_frame" enctype="multipart/form-data" method="post" style="display:inline-block;">
             <input type="hidden" name="id" value="{{ cipher.id }}"/>
@@ -105,7 +105,7 @@ No ciphers yet
             <input type="submit" value="Base64"/>
          </form>
       </td>
-      <td>
+      <td class="base64">
          <iframe name='decrypt_frame' height="24em" width="100%" frameborder="0" scrolling="no" ></iframe>
       </td>
       <td>

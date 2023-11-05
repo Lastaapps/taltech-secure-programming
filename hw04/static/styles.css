@@ -1,0 +1,23 @@
+
+.base64 {
+  /* display: inline-block; */
+  word-wrap: anywhere;
+  /* overflow-wrap: anywhere;
+  word-break: normal;
+  line-break: strict;
+  hyphens: none;
+  -webkit-hyphens: none;
+  -moz-hyphens: none; */
+  max-width: 256px
+}
+
+.base64 :first-child {
+  max-height: 128px;
+  overflow:scroll;
+}
+
+.ciphers-table {
+  width: 100%;
+  /* table-layout: fixed; */
+}
+

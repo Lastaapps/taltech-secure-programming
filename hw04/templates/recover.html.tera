@@ -6,47 +6,31 @@
 
 <p>Logged in as: {{ username }}, <a href="/logout">Logout</a></p>
 
-You as an admin can recover deleted users ciphers here.
+As an admin you can recover deleted users ciphers here.
 
 <h2>Ceasar ciphers</h2>
 
 <h4>Deleted ciphers:</h4>
 
 {% if ceasar_list | length == 0 %}
-No ciphers yet
+No deleted ciphers
 {% else %}
 
-<table width="100%" border="1px solid black">
+<table class="ciphers-table" border="1px solid black">
    <tr>
+      <th>Username</th>
       <th>Encrypted (base64)</th>
-      <th>Key</th>
-      <th>Decrypt to</th>
-      <th>Decrypted</th>
-      <th></th>
+      <th>Recover</th>
    </tr>
    {% for cipher in ceasar_list %}
    <tr>
-      <td>{{ cipher.base64 }}</td>
-      <td>{{ cipher.shift }}</td>
+      <td><div>{{ cipher.username }}</div></td>
+      <td class="base64"><div>{{ cipher.base64 }}</div></td>
       <td>
-         <form action="/decrypt-ceasar" target="decrypt_frame" enctype="multipart/form-data" method="post" style="display:inline-block;">
+         <form enctype="multipart/form-data" method="post">
             <input type="hidden" name="id" value="{{ cipher.id }}"/>
-            <input type="hidden" name="format" value="plain"/>
-            <input type="submit" value="Plain text"/>
-         </form>
-         <form action="/decrypt-ceasar" target="decrypt_frame" enctype="multipart/form-data" method="post" style="display:inline-block;">
-            <input type="hidden" name="id" value="{{ cipher.id }}"/>
-            <input type="hidden" name="format" value="base64"/>
-            <input type="submit" value="Base64"/>
-         </form>
-      </td>
-      <td>
-         <iframe name='decrypt_frame' height="24em" width="100%" frameborder="0" scrolling="no" ></iframe>
-      </td>
-      <td>
-         <form action="/delete-ceasar" enctype="multipart/form-data" method="post">
-            <input type="hidden" name="id" value="{{ cipher.id }}"/>
-            <input type="submit" value="Delete"/>
+            <input type="hidden" name="kind" value="ceasar"/>
+            <input type="submit" value="Recover"/>
          </form>
       </td>
    </tr>

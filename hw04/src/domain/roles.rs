@@ -32,7 +32,7 @@ impl<'r> FromRequest<'r> for Antonius {
             Ok(username) => username,
             Err(e) => {
                 eprintln!("Token validation failed: {:?}", e);
-                return Outcome::Failure((Status::BadRequest, e));
+                return Outcome::Failure((Status::Unauthorized, e));
             }
         };
 

@@ -1,22 +1,20 @@
+use crate::domain::database::BrutusDb;
 use crate::domain::hashing;
 use crate::domain::jwt::create_token;
 use crate::domain::roles::{store_jwt_token, KickFromLogin};
 use crate::domain::Outcome;
-use crate::domain::database::BrutusDb;
 use crate::models::LoginUserDto;
 use crate::util::username_validator;
 use diesel::prelude::*;
 use either::Either;
 
+use rocket::http::uri::Origin;
 use rocket::{form::Form, http::CookieJar, response::Redirect};
 use rocket_dyn_templates::{context, Template};
 
-#[get("/login")]
-pub async fn login_get(_kick: KickFromLogin) -> Template {
-    Template::render(
-        "login",
-        context! {},
-    )
+#[get("/login?<return_url>")]
+pub async fn login_get(_kick: KickFromLogin, return_url: Option<String>) -> Template {
+    Template::render("login", context! {})
 }
 
 #[derive(FromForm)]
@@ -28,12 +26,13 @@ pub struct LoginForm {
     password: String,
 }
 
-#[post("/login", data = "<data>")]
+#[post("/login?<return_url>", data = "<data>")]
 pub async fn login_post(
     db: BrutusDb,
     cookies: &CookieJar<'_>,
     _kick: KickFromLogin,
     data: Form<LoginForm>,
+    return_url: Option<String>,
 ) -> Outcome<Either<Template, Redirect>> {
     println!("Login user {}", &data.username);
     let username_copy = data.username.clone();
@@ -91,5 +90,19 @@ pub async fn login_post(
     store_jwt_token(cookies, &token);
 
     println!("User logged in");
-    Ok(Either::Right(Redirect::to(uri!("/"))))
+
+    let uri = match return_url {
+        Some(uri) => match Origin::parse(&uri) {
+            Ok(uri) => match uri.query() {
+                Some(query) => format!("{}?{}", uri.path(), query.as_str()),
+                None => uri.path().to_string(),
+            },
+            Err(e) => {
+                eprintln!("Return uri is invalid: {}", e);
+                "/".into()
+            }
+        },
+        None => "/".into(),
+    };
+    Ok(Either::Right(Redirect::to(uri)))
 }

@@ -1,1 +1,1 @@
-<p> {{ text }} </p>
+<p class="base64"> {{ text }} </p>

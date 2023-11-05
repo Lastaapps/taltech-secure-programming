@@ -12,7 +12,7 @@ pub struct DecryptCeasarPayload {
     is_base64: bool,
 }
 
-#[post("/decrypt-ceasar", data = "<data>")]
+#[post("/decrypt-cipher", data = "<data>")]
 pub async fn decrypt_cipher_post(user: Antonius, data: Form<DecryptCeasarPayload>) -> Template {
     Template::render(
         "decrypted",
