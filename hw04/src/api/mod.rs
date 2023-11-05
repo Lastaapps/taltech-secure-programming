@@ -1,9 +1,13 @@
 
-pub mod decrypt;
-pub mod index;
-pub mod login;
-pub mod logout;
-pub mod register;
+mod add_cipher;
+mod common;
+mod decrypt_cipher;
+mod delete_cipher;
+mod index;
+mod login;
+mod logout;
+mod recover_cipher;
+mod register;
 
 use rocket::{Build, Rocket, Request};
 use rocket_dyn_templates::{Template, context};
@@ -36,8 +40,14 @@ impl FuckRustApi {
                     crate::api::logout::logout_post,
                     // index
                     crate::api::index::index_get,
-                    // decrypt
-                    crate::api::decrypt::decrypt_ceasar_post,
+                    // ciphers
+                    crate::api::add_cipher::add_ceasar_post,
+                    crate::api::add_cipher::add_vigener_post,
+                    crate::api::decrypt_cipher::decrypt_cipher_post,
+                    crate::api::delete_cipher::delete_cipher_post,
+                    // recover
+                    crate::api::recover_cipher::recover_get,
+                    crate::api::recover_cipher::recover_post,
                 ],
             )
             .register("/", catchers![not_found])

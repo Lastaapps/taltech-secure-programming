@@ -25,11 +25,11 @@ Admin can see only encrypted text, your secrets cannot be decrypted.
    <tr>
       <td>
          <form action="/add-ceasar" target="msg_ceasar_plain" enctype="multipart/form-data" method="post">
-            <input type="hidden" name="is_base" value="false"/>
+            <input type="hidden" name="format" value="plain"/>
             <table border-spacing="8px">
                <tr>
-                  <td><label for="data">Plain text:</label></td>
-                  <td><input type="text" name="data" id="data" maxlength="1024"/><br></td>
+                  <td><label for="plain">Plain text:</label></td>
+                  <td><input type="text" name="plain" id="plain"/><br></td>
                </tr>
                <tr>
                   <td><label for="shift">Shift:</label></td>
@@ -44,11 +44,11 @@ Admin can see only encrypted text, your secrets cannot be decrypted.
       </td>
       <td>
          <form action="/add-ceasar" target="msg_ceasar_base64" enctype="multipart/form-data" method="post">
-            <input type="hidden" name="is_base" value="true"/>
+            <input type="hidden" name="format" value="base64"/>
             <table border-spacing="8px">
                <tr>
-                  <td><label for="data">Base64 (standard):</label></td>
-                  <td><input type="text" name="data" id="data" pattern="^[-A-Za-z0-9+/]*={0,3}$" maxlength="1024"/><br></td>
+                  <td><label for="plain">Base64 (standard):</label></td>
+                  <td><input type="text" name="plain" id="plain" pattern="^[-A-Za-z0-9+/]*={0,3}$"/><br></td>
                </tr>
                <tr>
                   <td><label for="shift">Shift:</label></td>
@@ -92,16 +92,14 @@ No ciphers yet
       <td>{{ cipher.base64 }}</td>
       <td>{{ cipher.shift }}</td>
       <td>
-         <form action="/decrypt-cipher" target="decrypt_frame" enctype="multipart/form-data" method="post" style="display:inline-block;">
+         <form action="/decrypt-ceasar" target="decrypt_frame" enctype="multipart/form-data" method="post" style="display:inline-block;">
             <input type="hidden" name="id" value="{{ cipher.id }}"/>
-            <input type="hidden" name="is_base64" value="false"/>
-            <input type="hidden" name="kind" value="ceasar"/>
+            <input type="hidden" name="format" value="plain"/>
             <input type="submit" value="Plain text"/>
          </form>
-         <form action="/decrypt-cipher" target="decrypt_frame" enctype="multipart/form-data" method="post" style="display:inline-block;">
+         <form action="/decrypt-ceasar" target="decrypt_frame" enctype="multipart/form-data" method="post" style="display:inline-block;">
             <input type="hidden" name="id" value="{{ cipher.id }}"/>
-            <input type="hidden" name="is_base64" value="true"/>
-            <input type="hidden" name="kind" value="ceasar"/>
+            <input type="hidden" name="format" value="base64"/>
             <input type="submit" value="Base64"/>
          </form>
       </td>
@@ -109,9 +107,8 @@ No ciphers yet
          <iframe name='decrypt_frame' height="24em" width="100%" frameborder="0" scrolling="no" ></iframe>
       </td>
       <td>
-         <form action="/delete-cipher" enctype="multipart/form-data" method="post">
+         <form action="/delete-ceasar" enctype="multipart/form-data" method="post">
             <input type="hidden" name="id" value="{{ cipher.id }}"/>
-            <input type="hidden" name="kind" value="ceasar"/>
             <input type="submit" value="Delete"/>
          </form>
       </td>

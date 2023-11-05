@@ -2,7 +2,7 @@ use crate::domain::hashing;
 use crate::domain::jwt::create_token;
 use crate::domain::roles::{store_jwt_token, KickFromLogin};
 use crate::domain::Outcome;
-use crate::domain::{database::BrutusDb, roles::Antonius};
+use crate::domain::database::BrutusDb;
 use crate::models::LoginUserDto;
 use crate::util::username_validator;
 use diesel::prelude::*;
@@ -15,15 +15,13 @@ use rocket_dyn_templates::{context, Template};
 pub async fn login_get(_kick: KickFromLogin) -> Template {
     Template::render(
         "login",
-        context! {
-            error_msg: "",
-        },
+        context! {},
     )
 }
 
 #[derive(FromForm)]
 pub struct LoginForm {
-    #[field(validate = len(1..))]
+    #[field(validate = len(1..33))]
     #[field(validate = username_validator())]
     username: String,
     #[field(validate = len(8..))]
