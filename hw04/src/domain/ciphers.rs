@@ -20,14 +20,14 @@ pub fn encode_ceasar(bytes: &mut [u8], shift: i64) -> Result<String, String> {
     Ok(general_purpose::STANDARD_NO_PAD.encode(bytes))
 }
 
-pub fn decode_ceasar(data: &str, shift: i64) -> Result<String, String> {
+pub fn decode_ceasar(data: &str, shift: i64) -> Result<Vec<u8>, String> {
     let mut bytes = general_purpose::STANDARD_NO_PAD
         .decode(data)
         .map_err(|e| format!("Base decode failed: {}", e))?;
 
     ceasar(&mut bytes, shift, false);
 
-    String::from_utf8(bytes).map_err(|e| format!("Output are not valid UTF bytes: {}", e))
+    Ok(bytes)
 }
 
 

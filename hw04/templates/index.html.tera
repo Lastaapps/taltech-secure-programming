@@ -85,13 +85,13 @@ No ciphers yet
       <td class="base64"><div>{{ cipher.base64 }}</div></td>
       <td class="base64"><div>{{ cipher.shift }}</div></td>
       <td>
-         <form action="/decrypt-cipher" target="decrypt_frame" enctype="multipart/form-data" method="post" style="display:inline-block;">
+         <form action="/decrypt-cipher" target="decrypt_frame_ceasar_{{ cipher.id }}" enctype="multipart/form-data" method="post" style="display:inline-block;">
             <input type="hidden" name="id" value="{{ cipher.id }}"/>
             <input type="hidden" name="is_base64" value="false"/>
             <input type="hidden" name="kind" value="ceasar"/>
             <input type="submit" value="Plain text"/>
          </form>
-         <form action="/decrypt-cipher" target="decrypt_frame" enctype="multipart/form-data" method="post" style="display:inline-block;">
+         <form action="/decrypt-cipher" target="decrypt_frame_ceasar_{{ cipher.id }}" enctype="multipart/form-data" method="post" style="display:inline-block;">
             <input type="hidden" name="id" value="{{ cipher.id }}"/>
             <input type="hidden" name="is_base64" value="true"/>
             <input type="hidden" name="kind" value="ceasar"/>
@@ -99,7 +99,7 @@ No ciphers yet
          </form>
       </td>
       <td class="base64">
-         <iframe name='decrypt_frame' height="24em" width="100%" frameborder="0" scrolling="no" ></iframe>
+         <iframe name='decrypt_frame_ceasar_{{ cipher.id }}' height="24em" width="100%" frameborder="0" scrolling="no" ></iframe>
       </td>
       <td>
          <div>{{ cipher.created }}<br>{{ cipher.updated }}</div>

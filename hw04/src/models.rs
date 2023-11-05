@@ -54,3 +54,11 @@ pub struct GetCeasarDto {
     pub updated: PrimitiveDateTime,
 }
 
+#[derive(Queryable, Selectable)]
+#[diesel(table_name = crate::schema::ceasar)]
+#[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+pub struct GetCeasarInternalsDto {
+    pub data: String,
+    pub shift: i32,
+}
+
