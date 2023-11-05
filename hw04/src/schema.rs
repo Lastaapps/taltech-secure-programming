@@ -3,11 +3,12 @@
 diesel::table! {
     ceasar (id) {
         id -> Integer,
+        user_id -> Integer,
         shift -> Integer,
         data -> Text,
-        deleted -> Integer,
-        created_at -> Timestamp,
-        updated_at -> Timestamp,
+        deleted -> Bool,
+        created -> Timestamp,
+        updated -> Timestamp,
     }
 }
 
@@ -16,8 +17,8 @@ diesel::table! {
         id -> Integer,
         name -> Text,
         deleted -> Bool,
-        created_at -> Timestamp,
-        updated_at -> Timestamp,
+        created -> Timestamp,
+        updated -> Timestamp,
     }
 }
 
@@ -26,8 +27,8 @@ diesel::table! {
         id -> Integer,
         user_id -> Integer,
         role_id -> Integer,
-        created_at -> Timestamp,
-        updated_at -> Timestamp,
+        created -> Timestamp,
+        updated -> Timestamp,
     }
 }
 
@@ -37,24 +38,27 @@ diesel::table! {
         username -> Text,
         password_hash -> Text,
         deleted -> Bool,
-        created_at -> Timestamp,
-        updated_at -> Timestamp,
+        created -> Timestamp,
+        updated -> Timestamp,
     }
 }
 
 diesel::table! {
     vigenere (id) {
         id -> Integer,
+        user_id -> Integer,
         key -> Text,
         data -> Text,
-        deleted -> Integer,
-        created_at -> Timestamp,
-        updated_at -> Timestamp,
+        deleted -> Bool,
+        created -> Timestamp,
+        updated -> Timestamp,
     }
 }
 
+diesel::joinable!(ceasar -> users (user_id));
 diesel::joinable!(roles_users -> roles (role_id));
 diesel::joinable!(roles_users -> users (user_id));
+diesel::joinable!(vigenere -> users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     ceasar,

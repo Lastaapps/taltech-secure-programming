@@ -24,8 +24,8 @@ Admin can see only encrypted text, your secrets cannot be decrypted.
 <table width="100%">
    <tr>
       <td>
-         <form action="/add-ceasar" target="msg_ceasar_plain" enctype="multipart/form-data" method="post">
-            <input type="hidden" name="is_base" value="false"/>
+         <form action="/add-cipher-ceasar" enctype="multipart/form-data" method="post">
+            <input type="hidden" name="is_base64" value="false"/>
             <table border-spacing="8px">
                <tr>
                   <td><label for="data">Plain text:</label></td>
@@ -43,8 +43,8 @@ Admin can see only encrypted text, your secrets cannot be decrypted.
          </form>
       </td>
       <td>
-         <form action="/add-ceasar" target="msg_ceasar_base64" enctype="multipart/form-data" method="post">
-            <input type="hidden" name="is_base" value="true"/>
+         <form action="/add-cipher-ceasar"  enctype="multipart/form-data" method="post">
+            <input type="hidden" name="is_base64" value="true"/>
             <table border-spacing="8px">
                <tr>
                   <td class="base64"><label for="data">Base64 (standard):</label></td>
@@ -60,14 +60,6 @@ Admin can see only encrypted text, your secrets cannot be decrypted.
                </tr>
             </table>
          </form>
-      </td>
-   </tr>
-   <tr>
-      <td>
-         <iframe name='msg_ceasar_plain' height="24em" width="100%" frameborder="0" scrolling="no" ></iframe>
-      </td>
-      <td>
-         <iframe name='msg_ceasar_base64' height="24em" width="100%" frameborder="0" scrolling="no"></iframe>
       </td>
    </tr>
 </table>

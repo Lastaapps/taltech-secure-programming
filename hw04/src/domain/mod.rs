@@ -1,4 +1,5 @@
 
+pub mod ciphers;
 pub mod database;
 pub mod jwt;
 pub mod roles;
@@ -16,6 +17,7 @@ pub enum DomainError {
     Diesel(diesel::result::Error),
     Argon2(argon2::password_hash::Error),
     JWT(jsonwebtoken::errors::Error),
+    NotBase64,
 }
 
 impl From<diesel::result::Error> for DomainError {
@@ -54,6 +56,10 @@ impl<'r, 'o: 'r> Responder<'r, 'o> for DomainError {
             DomainError::JWT(e) => {
                 eprint!("{}", e);
                 Err(Status::Unauthorized)
+            },
+            DomainError::NotBase64 => {
+                eprint!("Not a base64 payload");
+                Err(Status::BadRequest)
             },
         }
     }
