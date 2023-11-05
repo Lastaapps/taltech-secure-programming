@@ -85,6 +85,7 @@ No ciphers yet
       <th>Key</th>
       <th>Decrypt to</th>
       <th>Decrypted</th>
+      <th>Created/Updated</th>
       <th></th>
    </tr>
    {% for cipher in ceasar_list %}
@@ -107,6 +108,9 @@ No ciphers yet
       </td>
       <td class="base64">
          <iframe name='decrypt_frame' height="24em" width="100%" frameborder="0" scrolling="no" ></iframe>
+      </td>
+      <td>
+         <div>{{ cipher.created }}<br>{{ cipher.updated }}</div>
       </td>
       <td>
          <form action="/delete-cipher" enctype="multipart/form-data" method="post">

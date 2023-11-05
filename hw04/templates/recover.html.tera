@@ -20,12 +20,14 @@ No deleted ciphers
    <tr>
       <th>Username</th>
       <th>Encrypted (base64)</th>
+      <th>Created/Updated</th>
       <th>Recover</th>
    </tr>
    {% for cipher in ceasar_list %}
    <tr>
       <td><div>{{ cipher.username }}</div></td>
       <td class="base64"><div>{{ cipher.base64 }}</div></td>
+      <td><div>{{ cipher.created }}<br>{{ cipher.updated }}</div></td>
       <td>
          <form enctype="multipart/form-data" method="post">
             <input type="hidden" name="id" value="{{ cipher.id }}"/>
