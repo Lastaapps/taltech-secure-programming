@@ -28,7 +28,7 @@ pub async fn decrypt_cipher_post(
     let user_id = get_user_id(&db, &username).await?;
     let res: String = match data.kind {
         CipherKindPayload::Ceasar => {
-            let cipher = get_cipher_id(&db, user_id, data.id).await?;
+            let cipher = get_cipher_ceasar(&db, user_id, data.id).await?;
             let bytes = decode_ceasar(&cipher.data, cipher.shift.into())
                 .map_err(|e| DomainError::General(e))?;
 
@@ -52,7 +52,7 @@ pub async fn decrypt_cipher_post(
     ))
 }
 
-async fn get_cipher_id(
+async fn get_cipher_ceasar(
     db: &BrutusDb,
     user_id: i32,
     cipher_id: i32,
@@ -67,6 +67,7 @@ async fn get_cipher_id(
         ceasar
             .filter(user_id.eq(loc_user_id))
             .filter(id.eq(loc_cipher_id))
+            .filter(deleted.eq(false))
             .select(GetCeasarInternalsDto::as_select())
             .first(conn)
     })

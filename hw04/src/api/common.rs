@@ -68,3 +68,8 @@ pub fn decode_base64(data: &str) -> Result<Vec<u8>, DomainError> {
 
     Err(DomainError::NotBase64)
 }
+
+pub fn now_primitive() -> PrimitiveDateTime {
+    let now = OffsetDateTime::now_utc();
+    PrimitiveDateTime::new(now.date(), now.time())
+}

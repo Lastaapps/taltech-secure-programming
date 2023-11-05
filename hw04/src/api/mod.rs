@@ -8,11 +8,10 @@ mod logout;
 mod recover_cipher;
 mod register;
 
-use rocket::{response::Redirect, Build, Request, Rocket};
+use rocket::fs::{relative, NamedFile};
+use rocket::{http::Method, response::Redirect, Build, Request, Rocket};
 use rocket_dyn_templates::{context, Template};
 use std::path::Path;
-use rocket::fs::{NamedFile, relative};
-
 
 #[catch(404)]
 fn not_found(req: &Request<'_>) -> Template {
@@ -26,11 +25,14 @@ fn not_found(req: &Request<'_>) -> Template {
 
 #[catch(401)]
 fn unauthorized(req: &Request<'_>) -> Redirect {
-    let path = req.uri().path().as_str();
-
-    eprintln!("Catching 401, returnUrl is: {}", path);
-
-    Redirect::to(uri!(crate::api::login::login_get(return_url = Some(path))))
+    if req.method() == Method::Get {
+        let path = req.uri().path().as_str();
+        eprintln!("Catching 401, returnUrl is: {}", path);
+        Redirect::to(uri!(crate::api::login::login_get(return_url = Some(path))))
+    } else {
+        eprintln!("Catching 401, was not a GET request");
+        Redirect::to(uri!("/login"))
+    }
 }
 
 #[get("/favicon.ico")]
