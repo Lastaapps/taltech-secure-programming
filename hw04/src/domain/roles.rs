@@ -17,7 +17,7 @@ impl<'r> FromRequest<'r> for Antonius {
     type Error = DomainError;
 
     async fn from_request(req: &'r Request<'_>) -> request::Outcome<Self, Self::Error> {
-        let token = match req.cookies().get(JWT_COOKIE_KEY) {
+        let token = match req.cookies().get_private(JWT_COOKIE_KEY) {
             Some(token) => token,
             None => {
                 eprintln!("JWT token missing");
@@ -50,7 +50,7 @@ impl<'r> FromRequest<'r> for Antonius {
             })
             .await
             .unwrap();
-        if non_deleted_cnt != 0 {
+        if non_deleted_cnt == 0 {
             eprintln!("User deleted");
             return Outcome::Failure((
                 Status::Forbidden,
@@ -103,8 +103,9 @@ impl<'r> FromRequest<'r> for KickFromLogin {
     type Error = DomainError;
 
     async fn from_request(req: &'r Request<'_>) -> request::Outcome<Self, Self::Error> {
-        let cookies = req.guard::<&CookieJar>().await.unwrap();
-        if has_jwt_token(cookies) {
+        let status = req.guard::<Option<Antonius>>().await.unwrap();
+
+        if status.is_some() {
             Outcome::Failure((Status::PreconditionFailed, DomainError::General("Already logged in".into())))
         } else {
             Outcome::Success(KickFromLogin())
@@ -120,6 +121,3 @@ pub fn remove_jwt_token(cookies: &CookieJar) {
     cookies.remove_private(Cookie::named(JWT_COOKIE_KEY))
 }
 
-pub fn has_jwt_token(cookies: &CookieJar) -> bool {
-    cookies.get_private(JWT_COOKIE_KEY).is_some()
-}

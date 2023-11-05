@@ -6,74 +6,11 @@
 
 <p>Logged in as: {{ username }}, <a href="/logout">Logout</a></p>
 
-{% if admin %}
-<a href="/admin/recovery">Cipher recovery</a>
-{% else %}
-<i>
-Notice: In case you delete a cipher, watch this 
-<a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank">manual</a>
-and ask admin for cipher recovery.
-Admin can see only encrypted text, your secrets cannot be decrypted.
-</i>
-{% endif %}
+You as an admin can recover deleted users ciphers here.
 
 <h2>Ceasar ciphers</h2>
 
-<h4>Encypt and store new cipher:</h4>
-
-<table width="100%">
-   <tr>
-      <td>
-         <form action="/add-ceasar" target="msg_ceasar_plain" enctype="multipart/form-data" method="post">
-            <input type="hidden" name="format" value="plain"/>
-            <table border-spacing="8px">
-               <tr>
-                  <td><label for="plain">Plain text:</label></td>
-                  <td><input type="text" name="plain" id="plain"/><br></td>
-               </tr>
-               <tr>
-                  <td><label for="shift">Shift:</label></td>
-                  <td><input type="number" name="shift" id="shift" value="42" /><br></td>
-               </tr>
-               <tr>
-                  <td></td>
-                  <td><input type="submit" value="Encrypt and store"/></td>
-               </tr>
-            </table>
-         </form>
-      </td>
-      <td>
-         <form action="/add-ceasar" target="msg_ceasar_base64" enctype="multipart/form-data" method="post">
-            <input type="hidden" name="format" value="base64"/>
-            <table border-spacing="8px">
-               <tr>
-                  <td><label for="plain">Base64 (standard):</label></td>
-                  <td><input type="text" name="plain" id="plain" pattern="^[-A-Za-z0-9+/]*={0,3}$"/><br></td>
-               </tr>
-               <tr>
-                  <td><label for="shift">Shift:</label></td>
-                  <td><input type="number" name="shift" id="shift" value="42" /><br></td>
-               </tr>
-               <tr>
-                  <td></td>
-                  <td><input type="submit" value="Encrypt and store"/></td>
-               </tr>
-            </table>
-         </form>
-      </td>
-   </tr>
-   <tr>
-      <td>
-         <iframe name='msg_ceasar_plain' height="24em" width="100%" frameborder="0" scrolling="no" ></iframe>
-      </td>
-      <td>
-         <iframe name='msg_ceasar_base64' height="24em" width="100%" frameborder="0" scrolling="no"></iframe>
-      </td>
-   </tr>
-</table>
-<br>
-
-<h4>Stored ciphers:</h4>
+<h4>Deleted ciphers:</h4>
 
 {% if ceasar_list | length == 0 %}
 No ciphers yet

@@ -18,6 +18,10 @@ pub struct Claims {
     sub: String, // Optional. Subject (whom token refers to)
 }
 
+static ISSUER: &str = "Brutus";
+static AUDIENCE_WEB: &str = "web";
+static AUNDIENCES: [&str; 1] = [AUDIENCE_WEB];
+
 lazy_static! {
     static ref HMAC_KEY: String = env::var("JWT_HMAC_KEY").unwrap();
     static ref HMAC_KEY_ENCODE: EncodingKey = EncodingKey::from_secret(HMAC_KEY.as_bytes());
@@ -27,11 +31,17 @@ lazy_static! {
 pub fn create_token(username: &str) -> Result<String, DomainError> {
     let claims = Claims::new(username);
     let token = encode(&Header::default(), &claims, &HMAC_KEY_ENCODE)?;
+    println!("Created token:  {}", token);
     Ok(token)
 }
 
 pub fn verify_token(token: &str) -> Result<String, DomainError> {
-    let token = decode::<Claims>(token, &HMAC_KEY_DECODE, &Validation::new(Algorithm::HS256))?;
+    println!("Checking token: {}", token);
+    let mut validation = Validation::new(Algorithm::HS256);
+    validation.set_audience(&AUNDIENCES);
+    validation.set_issuer(&[ISSUER]);
+
+    let token = decode::<Claims>(token, &HMAC_KEY_DECODE, &validation)?;
     let claims = token.claims;
     Ok(claims.sub)
 }
@@ -49,10 +59,10 @@ impl Claims {
             .as_secs();
 
         Self {
-            aud: "web".into(),
+            aud: AUDIENCE_WEB.into(),
             exp,
             iat,
-            iss: "Brutus".into(),
+            iss: ISSUER.into(),
             nbf: iat,
             sub: username.to_owned(),
         }

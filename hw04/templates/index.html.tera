@@ -7,7 +7,7 @@
 <p>Logged in as: {{ username }}, <a href="/logout">Logout</a></p>
 
 {% if admin %}
-<a href="/admin/recovery">Cipher recovery</a>
+<a href="/recover-cipher">Cipher recovery</a>
 {% else %}
 <i>
 Notice: In case you delete a cipher, watch this 

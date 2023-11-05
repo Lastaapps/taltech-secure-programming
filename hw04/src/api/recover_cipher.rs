@@ -5,7 +5,7 @@ use crate::domain::roles::Ceasar;
 
 use super::common::CipherKindPayload;
 
-#[get("/recover")]
+#[get("/recover-cipher")]
 pub async fn recover_get(user: Ceasar) -> Template {
     Template::render(
         "recover",
