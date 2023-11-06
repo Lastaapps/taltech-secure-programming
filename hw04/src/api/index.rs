@@ -80,7 +80,7 @@ async fn get_ceasar(db: &BrutusDb, user_id: i32) -> Vec<CeasarCipher> {
             base64: cipher.data,
             shift: cipher.shift,
             created: format_date_for_web(&cipher.created.assume_utc()),
-            updated: format_date_for_web(&cipher.created.assume_utc()),
+            updated: format_date_for_web(&cipher.updated.assume_utc()),
         })
         .collect()
 }
@@ -108,7 +108,7 @@ async fn get_vigenere(db: &BrutusDb, user_id: i32) -> Vec<VigenereCipher> {
             base64: cipher.data,
             key: cipher.key,
             created: format_date_for_web(&cipher.created.assume_utc()),
-            updated: format_date_for_web(&cipher.created.assume_utc()),
+            updated: format_date_for_web(&cipher.updated.assume_utc()),
         })
         .collect()
 }

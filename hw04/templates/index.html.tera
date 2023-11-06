@@ -176,7 +176,7 @@ No ciphers yet
 No ciphers yet
 {% else %}
 
-<table class="vigenere-table" border="1px solid black">
+<table class="ciphers-table" border="1px solid black">
    <tr>
       <th>Encrypted (base64)</th>
       <th>Key</th>
@@ -190,13 +190,13 @@ No ciphers yet
       <td class="base64"><div>{{ cipher.base64 }}</div></td>
       <td class="base64"><div>{{ cipher.key }}</div></td>
       <td>
-         <form action="/decrypt-cipher" target="decrypt_frame_ceasar_{{ cipher.id }}" enctype="multipart/form-data" method="post" style="display:inline-block;">
+         <form action="/decrypt-cipher" target="decrypt_frame_vigenere_{{ cipher.id }}" enctype="multipart/form-data" method="post" style="display:inline-block;">
             <input type="hidden" name="id" value="{{ cipher.id }}"/>
             <input type="hidden" name="is_base64" value="false"/>
             <input type="hidden" name="kind" value="vigenere"/>
             <input type="submit" value="Plain text"/>
          </form>
-         <form action="/decrypt-cipher" target="decrypt_frame_ceasar_{{ cipher.id }}" enctype="multipart/form-data" method="post" style="display:inline-block;">
+         <form action="/decrypt-cipher" target="decrypt_frame_vigenere_{{ cipher.id }}" enctype="multipart/form-data" method="post" style="display:inline-block;">
             <input type="hidden" name="id" value="{{ cipher.id }}"/>
             <input type="hidden" name="is_base64" value="true"/>
             <input type="hidden" name="kind" value="vigenere"/>
@@ -204,7 +204,7 @@ No ciphers yet
          </form>
       </td>
       <td class="base64">
-         <iframe class="outframe" name='decrypt_frame_ceasar_{{ cipher.id }}' width="100%" frameborder="0" scrolling="no" ></iframe>
+         <iframe class="outframe" name='decrypt_frame_vigenere_{{ cipher.id }}' width="100%" frameborder="0" scrolling="no" ></iframe>
       </td>
       <td>
          <div>{{ cipher.created }}<br>{{ cipher.updated }}</div>

@@ -21,7 +21,7 @@ impl<'r> FromRequest<'r> for Antonius {
             Some(token) => token,
             None => {
                 eprintln!("JWT token missing");
-                return Outcome::Failure((
+                return Outcome::Error((
                     Status::Unauthorized,
                     DomainError::General("JWT token missing".into()),
                 ));
@@ -32,7 +32,7 @@ impl<'r> FromRequest<'r> for Antonius {
             Ok(username) => username,
             Err(e) => {
                 eprintln!("Token validation failed: {:?}", e);
-                return Outcome::Failure((Status::Unauthorized, e));
+                return Outcome::Error((Status::Unauthorized, e));
             }
         };
 
@@ -52,7 +52,7 @@ impl<'r> FromRequest<'r> for Antonius {
             .unwrap();
         if non_deleted_cnt == 0 {
             eprintln!("User deleted");
-            return Outcome::Failure((
+            return Outcome::Error((
                 Status::Forbidden,
                 DomainError::General("User deleted".into()),
             ));
@@ -88,7 +88,7 @@ impl<'r> FromRequest<'r> for Ceasar {
             .unwrap();
         if with_admin_role_cnt == 0 {
             eprintln!("Invalid admin access attempt");
-            return Outcome::Failure((
+            return Outcome::Error((
                 Status::Forbidden,
                 DomainError::General("Invalid admin access attempt".into()),
             ));
@@ -106,7 +106,7 @@ impl<'r> FromRequest<'r> for KickFromLogin {
         let status = req.guard::<Option<Antonius>>().await.unwrap();
 
         if status.is_some() {
-            Outcome::Failure((
+            Outcome::Error((
                 Status::PreconditionFailed,
                 DomainError::General("Already logged in".into()),
             ))
@@ -121,5 +121,5 @@ pub fn store_jwt_token(cookies: &CookieJar, token: &str) {
 }
 
 pub fn remove_jwt_token(cookies: &CookieJar) {
-    cookies.remove_private(Cookie::named(JWT_COOKIE_KEY))
+    cookies.remove_private(Cookie::from(JWT_COOKIE_KEY))
 }
