@@ -8,7 +8,7 @@ mod logout;
 mod recover_cipher;
 mod register;
 
-use rocket::fs::{relative, NamedFile};
+use rocket::fs::NamedFile;
 use rocket::{http::Method, response::Redirect, Build, Request, Rocket};
 use rocket_dyn_templates::{context, Template};
 use std::path::Path;
@@ -37,13 +37,13 @@ fn unauthorized(req: &Request<'_>) -> Redirect {
 
 #[get("/favicon.ico")]
 pub async fn favicon() -> Option<NamedFile> {
-    let path = Path::new(relative!("static/favicon.ico"));
+    let path = Path::new("static/favicon.ico");
     NamedFile::open(path).await.ok()
 }
 
 #[get("/styles.css")]
 pub async fn styles() -> Option<NamedFile> {
-    let path = Path::new(relative!("static/styles.css"));
+    let path = Path::new("static/styles.css");
     NamedFile::open(path).await.ok()
 }
 

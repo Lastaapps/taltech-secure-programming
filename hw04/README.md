@@ -14,6 +14,20 @@ After you register new admin account
 run `sqlite3 database.sqlite < make_admin_admin.sql`
 to make admin real admin.
 
+As you can see, the project uses SQLite - don't be surprised when
+some operations are kind of slow.
+But for a homework it is fine in my opinion.
+
+### Docker
+You can also build a docker image and run it,
+don't forget about env variables (they are of course not in the image)
+and volumes (not included bellow, as I will use docker compose anyway).
+
+```
+docker build -t brutus .
+docker run -it --env-file .env -p 8000:8000 brutus
+```
+
 ## Security
 Secrets are stored in .env.
 They are version only to make it simpler for you to set up the project.
