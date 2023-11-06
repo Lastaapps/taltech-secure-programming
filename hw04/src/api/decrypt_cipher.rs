@@ -3,8 +3,8 @@ use rocket::{form::Form, http::CookieJar, response::Redirect};
 use rocket_dyn_templates::{context, Template};
 
 use crate::{
-    domain::{database::BrutusDb, roles::Antonius, DomainError, ciphers::decode_ceasar},
-    models::GetCeasarInternalsDto,
+    domain::{database::BrutusDb, roles::Antonius, DomainError, ciphers::{decode_ceasar, decode_vigener}},
+    models::{GetCeasarInternalsDto, GetVigenereInternalsDto},
     schema::ceasar,
 };
 
@@ -41,7 +41,19 @@ pub async fn decrypt_cipher_post(
                 }
             }
         }
-        CipherKindPayload::Vigener => todo!(),
+        CipherKindPayload::Vigenere => {
+            let cipher = get_cipher_vigenere(&db, user_id, data.id).await?;
+            let bytes = decode_vigener(&cipher.data, &cipher.key)?;
+
+            if data.is_base64 {
+                general_purpose::STANDARD_NO_PAD.encode(bytes)
+            } else {
+                match String::from_utf8(bytes) {
+                    Ok(s) => s,
+                    Err(_) => "Use base64, decoded bytes are not valid UTF-8".into(),
+                }
+            }
+        },
     };
 
     Ok(Template::render(
@@ -69,6 +81,29 @@ async fn get_cipher_ceasar(
             .filter(id.eq(loc_cipher_id))
             .filter(deleted.eq(false))
             .select(GetCeasarInternalsDto::as_select())
+            .first(conn)
+    })
+    .await
+    .map_err(|_| DomainError::CipherNotFound)
+}
+
+async fn get_cipher_vigenere(
+    db: &BrutusDb,
+    user_id: i32,
+    cipher_id: i32,
+) -> Result<GetVigenereInternalsDto, DomainError> {
+    let loc_user_id = user_id;
+    let loc_cipher_id = cipher_id;
+
+    db.run(move |conn| {
+        use crate::schema::vigenere::dsl::*;
+        use diesel::prelude::*;
+
+        vigenere
+            .filter(user_id.eq(loc_user_id))
+            .filter(id.eq(loc_cipher_id))
+            .filter(deleted.eq(false))
+            .select(GetVigenereInternalsDto::as_select())
             .first(conn)
     })
     .await

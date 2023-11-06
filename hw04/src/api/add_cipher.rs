@@ -3,7 +3,7 @@ use rocket::{
     response::Redirect,
 };
 
-use crate::schema;
+use crate::{schema, models::InsertVigenereDto, domain::ciphers::encode_vigener};
 use crate::{
     domain::{ciphers::encode_ceasar, database::BrutusDb, roles::Antonius, DomainError},
     models::InsertCeasarDto,
@@ -70,6 +70,44 @@ pub struct AddCipherVigenerPayload {
 }
 
 #[post("/add-cipher-vigener", data = "<data>")]
-pub async fn add_vigener_post(user: Antonius, data: Form<AddCipherVigenerPayload>) -> Redirect {
-    Redirect::to(uri!("/login"))
+pub async fn add_vigener_post(
+    db: BrutusDb,
+    user: Antonius,
+    data: Form<AddCipherVigenerPayload>,
+) -> Result<Redirect, DomainError> {
+    let username = user.0;
+
+    let mut bytes = if data.is_base64 {
+        decode_base64(&data.data)?
+    } else {
+        data.data.as_bytes().to_vec()
+    };
+
+    let key = decode_base64(&data.key)?;
+
+    let (encoded, key) =
+        encode_vigener(&mut bytes, key.as_slice())?;
+    let user_id = get_user_id(&db, username.as_str()).await?;
+
+    let obj = InsertVigenereDto {
+        user_id,
+        data: encoded,
+        key,
+    };
+
+    insert_vigenere(&db, obj).await?;
+
+    Ok(Redirect::to(uri!("/")))
+}
+
+async fn insert_vigenere(db: &BrutusDb, obj: InsertVigenereDto) -> Result<(), DomainError> {
+    db.run(|conn| {
+        use diesel::prelude::*;
+        use schema::vigenere::dsl::*;
+
+        diesel::insert_into(vigenere).values(obj).execute(conn)
+    })
+    .await?;
+
+    Ok(())
 }

@@ -1,5 +1,7 @@
-use std::ops::Rem;
 use base64::{engine::general_purpose, Engine as _};
+use std::ops::Rem;
+
+use super::DomainError;
 
 // -- Ceasar ------------------------------------------------------------------
 fn ceasar(bytes: &mut [u8], shift: i64, encode: bool) {
@@ -30,36 +32,29 @@ pub fn decode_ceasar(data: &str, shift: i64) -> Result<Vec<u8>, String> {
     Ok(bytes)
 }
 
-
 // -- Vigener -----------------------------------------------------------------
-fn validate_vigener_input(bytes: &[u8], key: &[u8]) -> Result<(), String> {
+fn validate_vigener_input(bytes: &[u8], key: &[u8]) -> Result<(), DomainError> {
     if bytes.len() != key.len() {
-        return Err(format!(
-            "Input and key length mismatches! i: {} x k: {}",
-            bytes.len(),
-            key.len()
-        ));
+        Err(DomainError::VigenereKeyDifferentLength)?;
     };
     Ok(())
 }
 
-pub fn encode_vigener(data: &str, key: &str) -> Result<String, String> {
-    let mut bytes: Vec<u8> = data.bytes().collect();
-    let key = general_purpose::STANDARD_NO_PAD
-        .decode(key)
-        .map_err(|e| format!("Key base64 decode failed: {}", e))?;
-
+pub fn encode_vigener(bytes: &mut [u8], key: &[u8]) -> Result<(String, String), DomainError> {
     validate_vigener_input(&bytes, &key)?;
 
     bytes
         .iter_mut()
         .zip(key)
-        .for_each(|(x, y)| *x = x.wrapping_add(y));
+        .for_each(|(x, y)| *x = x.wrapping_add(*y));
 
-    Ok(general_purpose::STANDARD_NO_PAD.encode(bytes))
+    Ok((
+        general_purpose::STANDARD_NO_PAD.encode(bytes),
+        general_purpose::STANDARD_NO_PAD.encode(key),
+    ))
 }
 
-pub fn decode_vigener(data: &str, key: &str) -> Result<String, String> {
+pub fn decode_vigener(data: &str, key: &str) -> Result<Vec<u8>, DomainError> {
     let mut bytes = general_purpose::STANDARD_NO_PAD
         .decode(data)
         .map_err(|e| format!("Base decode failed: {}", e))?;
@@ -74,5 +69,5 @@ pub fn decode_vigener(data: &str, key: &str) -> Result<String, String> {
         .zip(key)
         .for_each(|(x, y)| *x = x.wrapping_sub(y));
 
-    String::from_utf8(bytes).map_err(|e| format!("Output are not valid UTF bytes: {}", e))
+    Ok(bytes)
 }

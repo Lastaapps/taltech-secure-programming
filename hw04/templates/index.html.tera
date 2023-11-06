@@ -19,7 +19,7 @@ Admin can see only encrypted text, your secrets cannot be decrypted.
 
 <h2>Ceasar ciphers</h2>
 
-<h4>Encypt and store new cipher:</h4>
+<h4>Encypt and store a new cipher:</h4>
 
 <table width="100%">
    <tr>
@@ -99,7 +99,7 @@ No ciphers yet
          </form>
       </td>
       <td class="base64">
-         <iframe name='decrypt_frame_ceasar_{{ cipher.id }}' height="24em" width="100%" frameborder="0" scrolling="no" ></iframe>
+         <iframe class="outframe" name='decrypt_frame_ceasar_{{ cipher.id }}' width="100%" frameborder="0" scrolling="no" ></iframe>
       </td>
       <td>
          <div>{{ cipher.created }}<br>{{ cipher.updated }}</div>
@@ -108,6 +108,111 @@ No ciphers yet
          <form action="/delete-cipher" enctype="multipart/form-data" method="post">
             <input type="hidden" name="id" value="{{ cipher.id }}"/>
             <input type="hidden" name="kind" value="ceasar"/>
+            <input type="submit" value="Delete"/>
+         </form>
+      </td>
+   </tr>
+   {% endfor %}
+</table>
+{% endif %}
+
+
+
+
+
+<h2>Vigenere ciphers</h2>
+
+<h4>Encypt and store a new cipher:</h4>
+
+<b>Make sure both the text and key are the same length (in bytes)!</b>
+
+<table width="100%">
+   <tr>
+      <td>
+         <form action="/add-cipher-vigener" enctype="multipart/form-data" method="post">
+            <input type="hidden" name="is_base64" value="false"/>
+            <table border-spacing="8px">
+               <tr>
+                  <td><label for="data">Plain text:</label></td>
+                  <td class="base64"><input type="text" name="data" id="data" maxlength="1024"/><br></td>
+               </tr>
+               <tr>
+                  <td><label for="key">Key (base64):</label></td>
+                  <td class="base64"><input type="text" name="key" id="key" pattern="^[-A-Za-z0-9+/]*={0,3}$" /><br></td>
+               </tr>
+               <tr>
+                  <td></td>
+                  <td><input type="submit" value="Encrypt and store"/></td>
+               </tr>
+            </table>
+         </form>
+      </td>
+      <td>
+         <form action="/add-cipher-vigener"  enctype="multipart/form-data" method="post">
+            <input type="hidden" name="is_base64" value="true"/>
+            <table border-spacing="8px">
+               <tr>
+                  <td class="base64"><label for="data">Base64 (standard):</label></td>
+                  <td><input type="text" name="data" id="data" pattern="^[-A-Za-z0-9+/]*={0,3}$" maxlength="1024"/><br></td>
+               </tr>
+               <tr>
+                  <td class="base64"><label for="key">Key (base64):</label></td>
+                  <td><input type="text" name="key" id="key" pattern="^[-A-Za-z0-9+/]*={0,3}$" /><br></td>
+               </tr>
+               <tr>
+                  <td></td>
+                  <td><input type="submit" value="Encrypt and store"/></td>
+               </tr>
+            </table>
+         </form>
+      </td>
+   </tr>
+</table>
+<br>
+
+<h4>Stored ciphers:</h4>
+
+{% if vigenere_list | length == 0 %}
+No ciphers yet
+{% else %}
+
+<table class="vigenere-table" border="1px solid black">
+   <tr>
+      <th>Encrypted (base64)</th>
+      <th>Key</th>
+      <th>Decrypt to</th>
+      <th>Decrypted</th>
+      <th>Created/Updated</th>
+      <th></th>
+   </tr>
+   {% for cipher in vigenere_list %}
+   <tr>
+      <td class="base64"><div>{{ cipher.base64 }}</div></td>
+      <td class="base64"><div>{{ cipher.key }}</div></td>
+      <td>
+         <form action="/decrypt-cipher" target="decrypt_frame_ceasar_{{ cipher.id }}" enctype="multipart/form-data" method="post" style="display:inline-block;">
+            <input type="hidden" name="id" value="{{ cipher.id }}"/>
+            <input type="hidden" name="is_base64" value="false"/>
+            <input type="hidden" name="kind" value="vigenere"/>
+            <input type="submit" value="Plain text"/>
+         </form>
+         <form action="/decrypt-cipher" target="decrypt_frame_ceasar_{{ cipher.id }}" enctype="multipart/form-data" method="post" style="display:inline-block;">
+            <input type="hidden" name="id" value="{{ cipher.id }}"/>
+            <input type="hidden" name="is_base64" value="true"/>
+            <input type="hidden" name="kind" value="vigenere"/>
+            <input type="submit" value="Base64"/>
+         </form>
+      </td>
+      <td class="base64">
+         <iframe class="outframe" name='decrypt_frame_ceasar_{{ cipher.id }}' width="100%" frameborder="0" scrolling="no" ></iframe>
+      </td>
+      <td>
+         <div>{{ cipher.created }}<br>{{ cipher.updated }}</div>
+      </td>
+      <td>
+         <form action="/delete-cipher" enctype="multipart/form-data" method="post">
+            <input type="hidden" name="id" value="{{ cipher.id }}"/>
+            <input type="hidden" name="kind" value="vigenere"/>
             <input type="submit" value="Delete"/>
          </form>
       </td>

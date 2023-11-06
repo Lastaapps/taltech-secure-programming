@@ -10,7 +10,7 @@ use crate::{
         roles::{Antonius, Ceasar},
         DomainError,
     },
-    models::GetCeasarDto,
+    models::{GetCeasarDto, GetVigenereDto},
 };
 use serde::Serialize;
 
@@ -24,7 +24,7 @@ struct CeasarCipher {
 }
 
 #[derive(Serialize)]
-struct VigenerCipher {
+struct VigenereCipher {
     id: i32,
     base64: String,
     key: String,
@@ -44,7 +44,8 @@ pub async fn index_get(
     };
 
     let user_id = get_user_id(&db, &username).await?;
-    let ceasar_list = get_ceasars(&db, user_id).await;
+    let ceasar_list = get_ceasar(&db, user_id).await;
+    let vigenere_list = get_vigenere(&db, user_id).await;
 
     Ok(Either::Left(Template::render(
         "index",
@@ -52,11 +53,12 @@ pub async fn index_get(
             username: username,
             admin: admin.is_some(),
             ceasar_list: ceasar_list,
+            vigenere_list: vigenere_list,
         },
     )))
 }
 
-async fn get_ceasars(db: &BrutusDb, user_id: i32) -> Vec<CeasarCipher> {
+async fn get_ceasar(db: &BrutusDb, user_id: i32) -> Vec<CeasarCipher> {
     let loc_user_id = user_id;
     let data: Vec<GetCeasarDto> = db
         .run(move |conn| {
@@ -78,6 +80,34 @@ async fn get_ceasars(db: &BrutusDb, user_id: i32) -> Vec<CeasarCipher> {
             id: cipher.id,
             base64: cipher.data,
             shift: cipher.shift,
+            created: format_date_for_web(&cipher.created.assume_utc()),
+            updated: format_date_for_web(&cipher.created.assume_utc()),
+        })
+        .collect()
+}
+
+async fn get_vigenere(db: &BrutusDb, user_id: i32) -> Vec<VigenereCipher> {
+    let loc_user_id = user_id;
+    let data: Vec<GetVigenereDto> = db
+        .run(move |conn| {
+            use crate::schema::vigenere::dsl::*;
+            use diesel::prelude::*;
+
+            vigenere
+                .filter(user_id.eq(loc_user_id))
+                .filter(deleted.eq(false))
+                .order_by(created)
+                .select(GetVigenereDto::as_select())
+                .load(conn)
+        })
+        .await
+        .unwrap();
+
+    data.into_iter()
+        .map(|cipher| VigenereCipher {
+            id: cipher.id,
+            base64: cipher.data,
+            key: cipher.key,
             created: format_date_for_web(&cipher.created.assume_utc()),
             updated: format_date_for_web(&cipher.created.assume_utc()),
         })

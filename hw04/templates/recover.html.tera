@@ -42,4 +42,39 @@ No deleted ciphers
 </table>
 {% endif %}
 
+
+
+
+<h2>Vigenere ciphers</h2>
+
+<h4>Deleted ciphers:</h4>
+
+{% if vigenere_list | length == 0 %}
+No deleted ciphers
+{% else %}
+
+<table class="ciphers-table" border="1px solid black">
+   <tr>
+      <th>Username</th>
+      <th>Encrypted (base64)</th>
+      <th>Created/Updated</th>
+      <th>Recover</th>
+   </tr>
+   {% for cipher in vigenere_list %}
+   <tr>
+      <td><div>{{ cipher.username }}</div></td>
+      <td class="base64"><div>{{ cipher.base64 }}</div></td>
+      <td><div>{{ cipher.created }}<br>{{ cipher.updated }}</div></td>
+      <td>
+         <form enctype="multipart/form-data" method="post">
+            <input type="hidden" name="id" value="{{ cipher.id }}"/>
+            <input type="hidden" name="kind" value="vigenere"/>
+            <input type="submit" value="Recover"/>
+         </form>
+      </td>
+   </tr>
+   {% endfor %}
+</table>
+{% endif %}
+
 {% endblock content %}

@@ -1,1 +1,9 @@
-<p class="base64"> {{ text }} </p>
+{% extends "base" %}
+
+{% block content %}
+
+<div class="base64">
+    <div>{{ text }}</div>
+</div>
+
+{% endblock content %}

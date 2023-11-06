@@ -20,6 +20,7 @@ pub enum DomainError {
 
     NotBase64,
     CipherNotFound,
+    VigenereKeyDifferentLength,
 }
 
 impl From<diesel::result::Error> for DomainError {
@@ -37,6 +38,12 @@ impl From<argon2::password_hash::Error> for DomainError {
 impl From<jsonwebtoken::errors::Error> for DomainError {
     fn from(value: jsonwebtoken::errors::Error) -> Self {
         DomainError::JWT(value)
+    }
+}
+
+impl From<String> for DomainError {
+    fn from(value: String) -> Self {
+        DomainError::General(value)
     }
 }
 
@@ -66,6 +73,10 @@ impl<'r, 'o: 'r> Responder<'r, 'o> for DomainError {
             DomainError::CipherNotFound => {
                 eprint!("Cipher not found");
                 Err(Status::NotFound)
+            },
+            DomainError::VigenereKeyDifferentLength => {
+                eprint!("Vigenere different length");
+                Err(Status::BadRequest)
             },
         }
     }

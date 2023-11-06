@@ -15,7 +15,7 @@ use base64::{
 #[derive(FromFormField)]
 pub enum CipherKindPayload {
     Ceasar,
-    Vigener,
+    Vigenere,
 }
 
 pub fn format_date_for_web(date: &OffsetDateTime) -> String {

@@ -40,7 +40,7 @@ pub struct UserUsernameDto {
     pub username: String,
 }
 
-// Ciphers
+// Ciphers - Ceasar
 #[derive(Insertable)]
 #[diesel(table_name = crate::schema::ceasar)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
@@ -73,6 +73,46 @@ pub struct GetCeasarInternalsDto {
 #[diesel(table_name = crate::schema::ceasar)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct GetCeasarForRecoveryDto {
+    pub id: i32,
+    pub data: String,
+    pub created: PrimitiveDateTime,
+    pub updated: PrimitiveDateTime,
+}
+
+
+// Ciphers - Vigenere
+#[derive(Insertable)]
+#[diesel(table_name = crate::schema::vigenere)]
+#[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+pub struct InsertVigenereDto {
+    pub user_id: i32,
+    pub data: String,
+    pub key: String,
+}
+
+#[derive(Queryable, Selectable)]
+#[diesel(table_name = crate::schema::vigenere)]
+#[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+pub struct GetVigenereDto {
+    pub id: i32,
+    pub data: String,
+    pub key: String,
+    pub created: PrimitiveDateTime,
+    pub updated: PrimitiveDateTime,
+}
+
+#[derive(Queryable, Selectable)]
+#[diesel(table_name = crate::schema::vigenere)]
+#[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+pub struct GetVigenereInternalsDto {
+    pub data: String,
+    pub key: String,
+}
+
+#[derive(Queryable, Selectable)]
+#[diesel(table_name = crate::schema::vigenere)]
+#[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+pub struct GetVigenereForRecoveryDto {
     pub id: i32,
     pub data: String,
     pub created: PrimitiveDateTime,
