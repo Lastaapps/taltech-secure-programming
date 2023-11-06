@@ -1,6 +1,6 @@
-use rocket::{form::Form, http::CookieJar, response::Redirect};
+use rocket::{form::Form, response::Redirect};
 use rocket_dyn_templates::{context, Template};
-use time::{macros::datetime, PrimitiveDateTime};
+use time::PrimitiveDateTime;
 
 use crate::{
     domain::{database::BrutusDb, roles::Ceasar, DomainError},

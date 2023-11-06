@@ -1,7 +1,6 @@
 use either::Either;
 use rocket::response::Redirect;
 use rocket_dyn_templates::{context, Template};
-use time::{format_description, macros::datetime, Date, OffsetDateTime, PrimitiveDateTime, Time};
 
 use super::common::{format_date_for_web, get_user_id};
 use crate::{

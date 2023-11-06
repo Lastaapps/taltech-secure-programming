@@ -3,13 +3,13 @@ use rocket::{
     response::Redirect,
 };
 
-use crate::{schema, models::InsertVigenereDto, domain::ciphers::encode_vigener};
+use crate::{domain::ciphers::encode_vigener, models::InsertVigenereDto, schema};
 use crate::{
     domain::{ciphers::encode_ceasar, database::BrutusDb, roles::Antonius, DomainError},
     models::InsertCeasarDto,
 };
 
-use super::common::{get_user_id, decode_base64};
+use super::common::{decode_base64, get_user_id};
 
 #[derive(FromForm)]
 pub struct AddCipherCeasarPayload {
@@ -34,7 +34,7 @@ pub async fn add_ceasar_post(
     };
 
     let encoded =
-        encode_ceasar(&mut bytes, data.shift.into()).map_err(|e| DomainError::General(e))?;
+        encode_ceasar(&mut bytes, data.shift.into())?;
     let user_id = get_user_id(&db, username.as_str()).await?;
 
     let obj = InsertCeasarDto {
@@ -85,8 +85,7 @@ pub async fn add_vigener_post(
 
     let key = decode_base64(&data.key)?;
 
-    let (encoded, key) =
-        encode_vigener(&mut bytes, key.as_slice())?;
+    let (encoded, key) = encode_vigener(&mut bytes, key.as_slice())?;
     let user_id = get_user_id(&db, username.as_str()).await?;
 
     let obj = InsertVigenereDto {

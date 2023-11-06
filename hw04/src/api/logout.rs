@@ -1,5 +1,5 @@
 use rocket::{http::CookieJar, response::Redirect};
-use rocket_dyn_templates::{Template, context};
+use rocket_dyn_templates::{context, Template};
 
 use crate::domain::roles::remove_jwt_token;
 

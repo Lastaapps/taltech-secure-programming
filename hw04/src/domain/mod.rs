@@ -1,12 +1,10 @@
-
 pub mod ciphers;
 pub mod database;
+pub mod hashing;
 pub mod jwt;
 pub mod roles;
-pub mod hashing;
 
-use rocket::{response::Responder, http::Status};
-
+use rocket::{http::Status, response::Responder};
 
 pub type Outcome<T> = Result<T, DomainError>;
 
@@ -53,32 +51,31 @@ impl<'r, 'o: 'r> Responder<'r, 'o> for DomainError {
             DomainError::General(e) => {
                 eprint!("{}", e);
                 Err(Status::InternalServerError)
-            },
+            }
             DomainError::Diesel(e) => {
                 eprint!("{}", e);
                 Err(Status::InternalServerError)
-            },
+            }
             DomainError::Argon2(e) => {
                 eprint!("{}", e);
                 Err(Status::InternalServerError)
-            },
+            }
             DomainError::JWT(e) => {
                 eprint!("{}", e);
                 Err(Status::Unauthorized)
-            },
+            }
             DomainError::NotBase64 => {
                 eprint!("Not a base64 payload");
                 Err(Status::BadRequest)
-            },
+            }
             DomainError::CipherNotFound => {
                 eprint!("Cipher not found");
                 Err(Status::NotFound)
-            },
+            }
             DomainError::VigenereKeyDifferentLength => {
                 eprint!("Vigenere different length");
                 Err(Status::BadRequest)
-            },
+            }
         }
     }
 }
-

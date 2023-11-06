@@ -13,6 +13,7 @@ use rocket::{form::Form, http::CookieJar, response::Redirect};
 use rocket_dyn_templates::{context, Template};
 
 #[get("/login?<return_url>")]
+#[allow(unused_variables)]
 pub async fn login_get(_kick: KickFromLogin, return_url: Option<String>) -> Template {
     Template::render("login", context! {})
 }

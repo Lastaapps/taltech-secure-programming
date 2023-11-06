@@ -41,7 +41,7 @@ fn validate_vigener_input(bytes: &[u8], key: &[u8]) -> Result<(), DomainError> {
 }
 
 pub fn encode_vigener(bytes: &mut [u8], key: &[u8]) -> Result<(String, String), DomainError> {
-    validate_vigener_input(&bytes, &key)?;
+    validate_vigener_input(bytes, key)?;
 
     bytes
         .iter_mut()

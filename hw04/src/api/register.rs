@@ -1,6 +1,6 @@
 use crate::domain::database::BrutusDb;
 use crate::domain::jwt::create_token;
-use crate::domain::roles::{store_jwt_token, Antonius, KickFromLogin};
+use crate::domain::roles::{store_jwt_token, KickFromLogin};
 use crate::domain::Outcome;
 use crate::models::CreateUserDto;
 use crate::util::username_validator;
@@ -38,7 +38,6 @@ pub async fn register_post(
     _kick: KickFromLogin,
     data: Form<RegisterForm>,
 ) -> Outcome<Either<Template, Redirect>> {
-
     println!("Registering new user {}", &data.username);
     let loc_username = data.username.clone();
 

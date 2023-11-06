@@ -1,11 +1,15 @@
 use base64::{engine::general_purpose, Engine};
-use rocket::{form::Form, http::CookieJar, response::Redirect};
+use rocket::form::Form;
 use rocket_dyn_templates::{context, Template};
 
 use crate::{
-    domain::{database::BrutusDb, roles::Antonius, DomainError, ciphers::{decode_ceasar, decode_vigener}},
+    domain::{
+        ciphers::{decode_ceasar, decode_vigener},
+        database::BrutusDb,
+        roles::Antonius,
+        DomainError,
+    },
     models::{GetCeasarInternalsDto, GetVigenereInternalsDto},
-    schema::ceasar,
 };
 
 use super::common::{get_user_id, CipherKindPayload};
@@ -29,8 +33,7 @@ pub async fn decrypt_cipher_post(
     let res: String = match data.kind {
         CipherKindPayload::Ceasar => {
             let cipher = get_cipher_ceasar(&db, user_id, data.id).await?;
-            let bytes = decode_ceasar(&cipher.data, cipher.shift.into())
-                .map_err(|e| DomainError::General(e))?;
+            let bytes = decode_ceasar(&cipher.data, cipher.shift.into())?;
 
             if data.is_base64 {
                 general_purpose::STANDARD_NO_PAD.encode(bytes)
@@ -53,7 +56,7 @@ pub async fn decrypt_cipher_post(
                     Err(_) => "Use base64, decoded bytes are not valid UTF-8".into(),
                 }
             }
-        },
+        }
     };
 
     Ok(Template::render(

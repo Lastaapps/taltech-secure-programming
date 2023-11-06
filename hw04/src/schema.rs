@@ -60,10 +60,4 @@ diesel::joinable!(roles_users -> roles (role_id));
 diesel::joinable!(roles_users -> users (user_id));
 diesel::joinable!(vigenere -> users (user_id));
 
-diesel::allow_tables_to_appear_in_same_query!(
-    ceasar,
-    roles,
-    roles_users,
-    users,
-    vigenere,
-);
+diesel::allow_tables_to_appear_in_same_query!(ceasar, roles, roles_users, users, vigenere,);

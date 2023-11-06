@@ -1,5 +1,5 @@
 use diesel::prelude::*;
-use time::{OffsetDateTime, PrimitiveDateTime};
+use time::PrimitiveDateTime;
 
 // User
 #[derive(Insertable)]
@@ -79,7 +79,6 @@ pub struct GetCeasarForRecoveryDto {
     pub updated: PrimitiveDateTime,
 }
 
-
 // Ciphers - Vigenere
 #[derive(Insertable)]
 #[diesel(table_name = crate::schema::vigenere)]
@@ -118,4 +117,3 @@ pub struct GetVigenereForRecoveryDto {
     pub created: PrimitiveDateTime,
     pub updated: PrimitiveDateTime,
 }
-

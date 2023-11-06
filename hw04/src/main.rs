@@ -9,12 +9,11 @@ mod models;
 mod schema;
 mod util;
 
-
 #[macro_use]
 extern crate lazy_static;
 
-use crate::domain::database::BrutusDb;
 use crate::api::FuckRustApi;
+use crate::domain::database::BrutusDb;
 
 #[macro_use]
 extern crate rocket;

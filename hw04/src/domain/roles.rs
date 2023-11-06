@@ -106,7 +106,10 @@ impl<'r> FromRequest<'r> for KickFromLogin {
         let status = req.guard::<Option<Antonius>>().await.unwrap();
 
         if status.is_some() {
-            Outcome::Failure((Status::PreconditionFailed, DomainError::General("Already logged in".into())))
+            Outcome::Failure((
+                Status::PreconditionFailed,
+                DomainError::General("Already logged in".into()),
+            ))
         } else {
             Outcome::Success(KickFromLogin())
         }
@@ -120,4 +123,3 @@ pub fn store_jwt_token(cookies: &CookieJar, token: &str) {
 pub fn remove_jwt_token(cookies: &CookieJar) {
     cookies.remove_private(Cookie::named(JWT_COOKIE_KEY))
 }
-

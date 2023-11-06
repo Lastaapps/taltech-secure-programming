@@ -1,10 +1,9 @@
-use rocket::{form::Form, http::CookieJar, response::Redirect};
-use rocket_dyn_templates::{context, Template};
-use time::{PrimitiveDateTime, OffsetDateTime};
+use rocket::{form::Form, response::Redirect};
+use time::PrimitiveDateTime;
 
 use crate::domain::{database::BrutusDb, roles::Antonius, DomainError};
 
-use super::common::{get_user_id, CipherKindPayload, now_primitive};
+use super::common::{get_user_id, now_primitive, CipherKindPayload};
 
 #[derive(FromForm)]
 pub struct DeleteCipherPayload {
@@ -23,10 +22,8 @@ pub async fn delete_cipher_post(
     let user_id = get_user_id(&db, &username).await?;
     let now = now_primitive();
     match data.kind {
-        CipherKindPayload::Ceasar => 
-            delete_cipher_ceasar(&db, user_id, data.id, now).await?,
-        CipherKindPayload::Vigenere => 
-            delete_cipher_vigenere(&db, user_id, data.id, now).await?,
+        CipherKindPayload::Ceasar => delete_cipher_ceasar(&db, user_id, data.id, now).await?,
+        CipherKindPayload::Vigenere => delete_cipher_vigenere(&db, user_id, data.id, now).await?,
     };
 
     Ok(Redirect::to(uri!("/")))

@@ -1,5 +1,5 @@
 use time::{
-    format_description, macros::datetime, Date, OffsetDateTime, PrimitiveDateTime, Time, UtcOffset,
+    format_description, OffsetDateTime, PrimitiveDateTime, UtcOffset,
 };
 
 use crate::domain::database::BrutusDb;
@@ -8,7 +8,7 @@ use crate::models::UserIdDto;
 use crate::schema;
 use base64::{
     alphabet,
-    engine::{general_purpose, DecodePaddingMode, GeneralPurpose, GeneralPurposeConfig},
+    engine::{DecodePaddingMode, GeneralPurpose, GeneralPurposeConfig},
     Engine as _,
 };
 
@@ -54,8 +54,8 @@ lazy_static! {
         let config: GeneralPurposeConfig =
             GeneralPurposeConfig::new().with_decode_padding_mode(DecodePaddingMode::Indifferent);
         [
-            GeneralPurpose::new(&alphabet::STANDARD, config.clone()),
-            GeneralPurpose::new(&alphabet::URL_SAFE, config.clone()),
+            GeneralPurpose::new(&alphabet::STANDARD, config),
+            GeneralPurpose::new(&alphabet::URL_SAFE, config),
         ]
     };
 }
@@ -72,15 +72,7 @@ pub fn decode_base64(data: &str) -> Result<Vec<u8>, DomainError> {
 
 pub fn now_primitive() -> PrimitiveDateTime {
     let now = OffsetDateTime::now_utc();
-    let time = now
-        .time()
-        .replace_millisecond(0)
-        .unwrap();
+    let time = now.time().replace_millisecond(0).unwrap();
 
     PrimitiveDateTime::new(now.date(), time)
 }
-
-
-
-
-
