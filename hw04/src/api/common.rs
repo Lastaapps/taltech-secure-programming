@@ -27,9 +27,10 @@ pub fn format_date_for_web(date: &OffsetDateTime) -> String {
 }
 
 pub async fn get_user_id(db: &BrutusDb, username: &str) -> Result<i32, DomainError> {
+    let loc_username = username.to_string();
+
     match db
         .run(|conn| {
-            let loc_username = username.clone();
             use diesel::prelude::*;
             use schema::users::dsl::*;
 
@@ -71,5 +72,15 @@ pub fn decode_base64(data: &str) -> Result<Vec<u8>, DomainError> {
 
 pub fn now_primitive() -> PrimitiveDateTime {
     let now = OffsetDateTime::now_utc();
-    PrimitiveDateTime::new(now.date(), now.time())
+    let time = now
+        .time()
+        .replace_millisecond(0)
+        .unwrap();
+
+    PrimitiveDateTime::new(now.date(), time)
 }
+
+
+
+
+

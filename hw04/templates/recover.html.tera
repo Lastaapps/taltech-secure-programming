@@ -6,7 +6,9 @@
 
 <p>Logged in as: {{ username }}, <a href="/logout">Logout</a></p>
 
-As an admin you can recover deleted users ciphers here.
+<a href="/">Home</a>
+
+<p>As an admin you can recover deleted users ciphers here.</p>
 
 <h2>Ceasar ciphers</h2>
 

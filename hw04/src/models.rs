@@ -33,6 +33,13 @@ pub struct UserIdDto {
     pub id: i32,
 }
 
+#[derive(Queryable, Selectable)]
+#[diesel(table_name = crate::schema::users)]
+#[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+pub struct UserUsernameDto {
+    pub username: String,
+}
+
 // Ciphers
 #[derive(Insertable)]
 #[diesel(table_name = crate::schema::ceasar)]
@@ -60,5 +67,15 @@ pub struct GetCeasarDto {
 pub struct GetCeasarInternalsDto {
     pub data: String,
     pub shift: i32,
+}
+
+#[derive(Queryable, Selectable)]
+#[diesel(table_name = crate::schema::ceasar)]
+#[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+pub struct GetCeasarForRecoveryDto {
+    pub id: i32,
+    pub data: String,
+    pub created: PrimitiveDateTime,
+    pub updated: PrimitiveDateTime,
 }
 
