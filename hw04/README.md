@@ -1,8 +1,6 @@
 # Brutus
 Totally secure web store for all your ciphers.
 
-Web can be found at [lastope2.sh.cvut.cz/brutus](https://lastope2.sh.cvut.cz/brutus)
-
 ## Building and running
 Same as normal rust application
 (it will take a while to build for the first time):
